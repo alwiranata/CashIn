@@ -1,0 +1,35 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "api": "nodemon --exec ts-node src/index.ts",
+    "start": "node dist/index.js ",
+    "studio": "prisma studio",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@types/dotenv": "^6.1.1",
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.0.2",
+    "@types/pg": "^8.16.0",
+    "dotenv": "^17.2.3",
+    "eslint": "^9.39.2",
+    "express": "^5.2.1",
+    "nodemon": "^3.1.11",
+    "prettier": "^3.7.4",
+    "prisma": "^7.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.1.0",
+    "@prisma/client": "^7.1.0",
+    "pg": "^8.16.3"
+  }
+}
