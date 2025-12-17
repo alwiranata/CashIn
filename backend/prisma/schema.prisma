@@ -17,12 +17,31 @@ enum Role {
   USER
 }
 
+enum typeTransaction {
+  INCOME
+  EXSPENSE
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  type      Role     @default(USER)
-  status    Status   @default(NONACTIVE)
-  createdAt DateTime @default(now())
-  updateAt  DateTime @updatedAt
+  id           Int           @id @default(autoincrement())
+  name         String
+  email        String        @unique
+  password     String
+  role         Role          @default(USER)
+  status       Status        @default(NONACTIVE)
+  createdAt    DateTime      @default(now())
+  updateAt     DateTime      @updatedAt
+  transactions Transaction[]
+}
+
+model Transaction {
+  id              Int             @id @default(autoincrement())
+  nameTransaction String
+  price           Int
+  typeTransaction typeTransaction
+  transactionDate DateTime        @default(now())
+  createdAt       DateTime        @default(now())
+  updateAt        DateTime        @updatedAt
+  userId          Int
+  user            User            @relation(fields: [userId], references: [id])
 }
