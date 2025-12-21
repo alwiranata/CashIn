@@ -1,6 +1,6 @@
 import z from "zod";
 
-export const creatUserSchema = z.object({
+export const creatUserValidation = z.object({
   name: z.string().min(1, "Name is required"),
   email: z.string().email(),
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -8,7 +8,7 @@ export const creatUserSchema = z.object({
   status: z.enum(["ACTIVE", "NONACTIVE"]).optional(),
 });
 
-export const updateUserSchema = z.object({
+export const updateUserValidation = z.object({
   name: z.string().min(1, "Name is required").optional(),
   password: z
     .string()

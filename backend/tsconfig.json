@@ -7,8 +7,9 @@
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
-    "module": "nodenext",
-    "target": "esnext",
+    "module": "CommonJS",
+    "target": "ES2020",
+
     "types": [],
     // For nodejs:
     // "lib": ["esnext"],
@@ -35,12 +36,11 @@
     // Recommended Options
     "strict": true,
     "jsx": "react-jsx",
-    "verbatimModuleSyntax": false,
-    "isolatedModules": true,
+    "esModuleInterop": true,
+
     "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
   "include": ["src/**/*.ts"],
-  "exclude" : ["prisma.config.ts","node_modules"]
+  "exclude": ["prisma.config.ts", "node_modules"]
 }
