@@ -1,8 +1,6 @@
 generator client {
-
   provider = "prisma-client-js"
 }
-
 
 datasource db {
   provider = "postgresql"
@@ -23,16 +21,19 @@ enum typeTransaction {
   EXSPENSE
 }
 
+//npx prisma formaat for clean code
 model User {
-  id           Int           @id @default(autoincrement())
-  name         String
-  email        String        @unique
-  password     String
-  role         Role          @default(USER)
-  status       Status        @default(NONACTIVE)
-  createdAt    DateTime      @default(now())
-  updateAt     DateTime      @updatedAt
-  transactions Transaction[]
+  id                  Int           @id @default(autoincrement())
+  name                String
+  email               String        @unique
+  password            String
+  role                Role          @default(USER)
+  status              Status        @default(NONACTIVE)
+  activationToken     String?       @unique
+  activationExpiredAt DateTime?
+  createdAt           DateTime      @default(now())
+  updateAt            DateTime      @updatedAt
+  transactions        Transaction[]
 }
 
 model Transaction {
