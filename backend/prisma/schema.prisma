@@ -18,7 +18,7 @@ enum Role {
 
 enum typeTransaction {
   INCOME
-  EXSPENSE
+  EXPENSE
 }
 
 //npx prisma formaat for clean code
@@ -44,6 +44,6 @@ model Transaction {
   transactionDate DateTime        @default(now())
   createdAt       DateTime        @default(now())
   updateAt        DateTime        @updatedAt
-  userId          Int
-  user            User            @relation(fields: [userId], references: [id])
+  createdBy       Int
+  user            User            @relation(fields: [createdBy], references: [id])
 }
