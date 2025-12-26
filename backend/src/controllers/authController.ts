@@ -42,16 +42,66 @@ export const register = async (req: Request, res: Response) => {
       },
     });
     //send activationlink
-    const activationLink = `${process.env.BASE_URL}/auth/activate/${activationToken}`;
+    const activationLink = `${process.env.BASE_URL}/api/auth/activate/${activationToken}`;
     await transporter.sendMail({
       to: user.email,
       subject: "Activate your CashIn account",
       html: `
-      <h3>Welcome to CashIn</h3>
-      <p>Click link below to activate your account:</p>
-      <a href="${activationLink}">${activationLink}</a>
-      <p>This link expires in 1 hour</p>
-      `,
+  <div style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:30px;">
+    <div style="max-width:600px; margin:auto; background:#ffffff; border-radius:8px; overflow:hidden;">
+      
+      <!-- Header -->
+      <div style="background:#2563eb; padding:20px; text-align:center;">
+        <h1 style="color:#ffffff; margin:0;">CashIn</h1>
+      </div>
+
+      <!-- Content -->
+      <div style="padding:30px; color:#333;">
+        <h2 style="margin-top:0;">Welcome to CashIn 👋</h2>
+        <p>Hi <strong>${user.name}</strong>,</p>
+
+        <p>
+          Thank you for registering at <strong>CashIn</strong>.
+          Please confirm your email address by clicking the button below:
+        </p>
+
+        <div style="text-align:center; margin:30px 0;">
+          <a href="${activationLink}"
+            style="
+              background:#2563eb;
+              color:#ffffff;
+              padding:14px 28px;
+              text-decoration:none;
+              border-radius:6px;
+              font-weight:bold;
+              display:inline-block;
+            ">
+            Activate Account
+          </a>
+        </div>
+
+        <p>
+          This activation link will expire in <strong>1 hour</strong>.
+          If you did not create this account, please ignore this email.
+        </p>
+
+        <p style="font-size:14px; color:#666;">
+          If the button doesn’t work, copy and paste this link into your browser:
+        </p>
+
+        <p style="word-break:break-all; font-size:13px; color:#2563eb;">
+          ${activationLink}
+        </p>
+      </div>
+
+      <!-- Footer -->
+      <div style="background:#f1f5f9; padding:15px; text-align:center; font-size:12px; color:#555;">
+        © ${new Date().getFullYear()} CashIn. All rights reserved.
+      </div>
+
+    </div>
+  </div>
+  `,
     });
     //response
     return res.status(201).json({
@@ -174,9 +224,65 @@ export const activateToken = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(200).json({
-      meesage: "Account activated successfully",
-    });
+    return res.status(200).send(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="UTF-8">
+        <title>Account Activated</title>
+        <style>
+          body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #4f46e5, #22c55e);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+          }
+          .card {
+            background: #fff;
+            padding: 40px;
+            border-radius: 12px;
+            width: 420px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+          }
+          .icon {
+            font-size: 64px;
+            color: #22c55e;
+          }
+          h1 {
+            margin: 20px 0 10px;
+          }
+          p {
+            color: #555;
+          }
+          a {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 24px;
+            background: #4f46e5;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+          }
+          a:hover {
+            background: #4338ca;
+          }
+        </style>
+      </head>
+      <body>
+        <div class="card">
+          <div class="icon">✅</div>
+          <h1>Account Activated</h1>
+          <p>Your account has been successfully activated.</p>
+          <p>You can now login and start using CashIn.</p>
+        </div>
+      </body>
+      </html>
+    `);
   } catch (error) {
     return res.status(500).json({
       message: "Internal server error",
