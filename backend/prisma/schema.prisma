@@ -40,7 +40,7 @@ model Transaction {
   id              Int             @id @default(autoincrement())
   nameTransaction String
   price           Int
-  typeTransaction typeTransaction
+  typeTransaction typeTransaction 
   transactionDate DateTime        @default(now())
   createdAt       DateTime        @default(now())
   updateAt        DateTime        @updatedAt
