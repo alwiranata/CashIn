@@ -23,6 +23,7 @@ export const createTransaction = async (req: Request, res: Response) => {
     return res.status(201).json({
       message: "Transaction created successfully",
       data: {
+        idTransaction: transaction.id,
         nameTransaction: transaction.nameTransaction,
         price: transaction.price,
         typeTransaction: transaction.typeTransaction,
@@ -83,6 +84,7 @@ export const updateTransaction = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Transaction update successfully",
       data: {
+        idTransaction: transaction.id,
         nameTransaction: transaction.nameTransaction,
         price: transaction.price,
         typeTransaction: transaction.typeTransaction,
@@ -102,6 +104,61 @@ export const updateTransaction = async (req: Request, res: Response) => {
       });
     }
     // server error
+    return res.status(500).json({
+      message: "Internal Server Error",
+      error: error,
+    });
+  }
+};
+
+export const deleteTransaction = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        message: "Transaction ID is Requiered",
+      });
+    }
+
+    const idNumber = Number(id);
+
+    const findTransaction = await prisma.transaction.findUnique({
+      where: {
+        id: idNumber,
+      },
+    });
+
+    if (!findTransaction) {
+      return res.status(404).json({
+        message: "Transaction not found",
+      });
+    }
+
+    const deleteTransaction = await prisma.transaction.delete({
+      where: {
+        id: idNumber,
+      },
+    });
+
+    res.status(200).json({
+      message: "Transaction delete successfully",
+      data: {
+        transaction: deleteTransaction,
+      },
+    });
+    
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        message: "Validation error",
+        errors: error.issues.map((err) => ({
+          field: err.path.join("."),
+          message: err.message,
+        })),
+      });
+    }
+
     return res.status(500).json({
       message: "Internal Server Error",
       error: error,
