@@ -22,14 +22,7 @@ export const createTransaction = async (req: Request, res: Response) => {
 
     return res.status(201).json({
       message: "Transaction created successfully",
-      data: {
-        idTransaction: transaction.id,
-        nameTransaction: transaction.nameTransaction,
-        price: transaction.price,
-        typeTransaction: transaction.typeTransaction,
-        transactionDate: transaction.transactionDate,
-        createdBy: transaction.createdBy,
-      },
+      data: transaction,
     });
   } catch (error) {
     //zod error
