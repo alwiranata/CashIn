@@ -6,6 +6,51 @@ import {
 import { ZodError } from "zod";
 import { prisma } from "../lib/prisma";
 
+export const getTransation = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        message: "Transaction ID is Required",
+      });
+    }
+
+    const idNumber = Number(id);
+
+    const findtansaction = await prisma.transaction.findUnique({
+      where: {
+        id: idNumber,
+      },
+    });
+
+    if (!findtansaction) {
+      return res.status(404).json({
+        message: "Trnasaction Not Found",
+      });
+    }
+
+    return res.status(200).json({
+      message: `Get data id ${findtansaction.id} successfully`,
+      data: findtansaction,
+    });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        message: "Validation error",
+        error: error.issues.map((err) => ({
+          field: err.path.join("."),
+          message: err.message,
+        })),
+      });
+    }
+
+    return res.status(500).json({
+      message: "internal server error",
+    });
+  }
+};
+
 export const createTransaction = async (req: Request, res: Response) => {
   try {
     const validated = createTransactioValidation.parse(req.body);
