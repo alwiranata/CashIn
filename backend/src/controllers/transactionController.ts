@@ -6,6 +6,32 @@ import {
 import { ZodError } from "zod";
 import { prisma } from "../lib/prisma";
 
+export const getAllTransaction = async (req: Request, res: Response) => {
+  try {
+    const transaction = await prisma.transaction.findMany();
+
+    return res.status(200).json({
+      message: "Get all data sucessfully",
+      data: transaction,
+    });
+    
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        message: "Validation Error",
+        error: error.issues.map((err) => ({
+          field: err.path.join("."),
+          message: err.message,
+        })),
+      });
+    }
+
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 export const getTransation = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -26,7 +52,7 @@ export const getTransation = async (req: Request, res: Response) => {
 
     if (!findtansaction) {
       return res.status(404).json({
-        message: "Trnasaction Not Found",
+        message: "Transaction Not Found",
       });
     }
 
