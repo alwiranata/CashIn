@@ -61,10 +61,25 @@ export const updateTransaction = async (req: Request, res: Response) => {
     }
     const validated = updateTransactionValidation.parse(req.body);
 
-    const transaction = await prisma.transaction.update({
+    const idNumber = Number(id);
+
+    const findTransaction = await prisma.transaction.findUnique({
       where: {
-        id: Number(id),
+        id: idNumber,
       },
+    });
+
+    if (!findTransaction) {
+      return res.status(404).json({
+        message: "Transaction not found",
+      });
+    }
+
+    const updateTransaction = await prisma.transaction.update({
+      where: {
+        id: idNumber,
+      },
+
       data: {
         ...(validated.nameTransaction && {
           nameTransaction: validated.nameTransaction,
@@ -83,14 +98,7 @@ export const updateTransaction = async (req: Request, res: Response) => {
 
     res.status(200).json({
       message: "Transaction update successfully",
-      data: {
-        idTransaction: transaction.id,
-        nameTransaction: transaction.nameTransaction,
-        price: transaction.price,
-        typeTransaction: transaction.typeTransaction,
-        transactionDate: transaction.transactionDate,
-        createdBy: transaction.createdBy,
-      },
+      data: updateTransaction,
     });
   } catch (error) {
     //zod error
@@ -147,7 +155,6 @@ export const deleteTransaction = async (req: Request, res: Response) => {
         transaction: deleteTransaction,
       },
     });
-    
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(400).json({
