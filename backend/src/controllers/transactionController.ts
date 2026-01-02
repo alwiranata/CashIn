@@ -14,7 +14,6 @@ export const getAllTransaction = async (req: Request, res: Response) => {
       message: "Get all data sucessfully",
       data: transaction,
     });
-    
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(400).json({
@@ -87,7 +86,7 @@ export const createTransaction = async (req: Request, res: Response) => {
         price: validated.price,
         typeTransaction: validated.typeTransaction,
         transactionDate: validated.transactionDate ?? new Date(),
-        createdBy: 12,
+        createdById: 12,
       },
     });
 

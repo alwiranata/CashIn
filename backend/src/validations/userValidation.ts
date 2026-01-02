@@ -17,3 +17,7 @@ export const updateUserValidation = z.object({
   role: z.enum(["USER", "ADMIN"]).optional(),
   status: z.enum(["ACTIVE", "NONACTIVE"]).optional(),
 });
+
+export const getUserEmailValidation = z.object({
+  email: z.string().email(),
+});
