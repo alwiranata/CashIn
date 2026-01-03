@@ -6,7 +6,6 @@ import { getUserEmailValidation } from "../validations";
 export const getUserEmail = async (req: Request, res: Response) => {
   try {
     const findEmail = getUserEmailValidation.parse(req.body);
-
     if (!findEmail) {
       return res.status(400).json({
         message: "Email is required",
@@ -39,6 +38,30 @@ export const getUserEmail = async (req: Request, res: Response) => {
     }
     return res.status(500).json({
       message: "Internal Server error",
+    });
+  }
+};
+
+export const getAllUser = async (req: Request, res: Response) => {
+  try {
+    const user = await prisma.user.findMany();
+
+    return res.status(200).json({
+      messsage: "Get all data sucessfully",
+      data: user,
+    });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.json(400).json({
+        message: "Validation Error",
+        errro: error.issues.map((err) => ({
+          field: err.path.join("."),
+          message: err.message,
+        })),
+      });
+    }
+    return res.status(500).json({
+      message: "Internal Server Error",
     });
   }
 };
