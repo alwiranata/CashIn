@@ -41,6 +41,7 @@ export const register = async (req: Request, res: Response) => {
         activationExpiredAt: activationExpiredAt,
       },
     });
+    
     //send activationlink
     const activationLink = `${process.env.BASE_URL}/api/auth/activate/${activationToken}`;
     await transporter.sendMail({
