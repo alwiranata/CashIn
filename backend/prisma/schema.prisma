@@ -40,10 +40,11 @@ model Transaction {
   id              Int             @id @default(autoincrement())
   nameTransaction String
   price           Int
-  typeTransaction typeTransaction 
+  image          String?
+  typeTransaction typeTransaction
   transactionDate DateTime        @default(now())
   createdAt       DateTime        @default(now())
   updateAt        DateTime        @updatedAt
-  createdById       Int
+  createdById     Int
   user            User            @relation(fields: [createdById], references: [id])
 }

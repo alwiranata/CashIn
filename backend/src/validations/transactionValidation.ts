@@ -5,6 +5,7 @@ export const createTransactioValidation = z.object({
   price: z.number().int().positive("Price must be greater than 0"),
   transactionDate: z.coerce.date().optional(),
   typeTransaction: z.enum(["INCOME", "EXPENSE"]),
+  image: z.string().optional(),
 });
 
 export const updateTransactionValidation = z.object({
@@ -12,4 +13,5 @@ export const updateTransactionValidation = z.object({
   price: z.number().int().positive("Price must be greater than 0").optional(),
   transactionDate: z.coerce.date().optional(),
   typeTransaction: z.enum(["INCOME", "EXPENSE"]).optional(),
+  image: z.string().optional(),
 });

@@ -3,7 +3,6 @@ import { ZodError } from "zod";
 import { prisma } from "../lib/prisma";
 import { getUserEmailValidation, createUserValidation } from "../validations";
 import bcrypt from "bcrypt";
-import crypto from "crypto";
 
 export const getUserEmail = async (req: Request, res: Response) => {
   try {

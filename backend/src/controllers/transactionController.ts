@@ -5,6 +5,7 @@ import {
 } from "../validations";
 import { ZodError } from "zod";
 import { prisma } from "../lib/prisma";
+import { removeUndefined } from "../utils/removeUndefine";
 
 export const getAllTransaction = async (req: Request, res: Response) => {
   try {
@@ -85,8 +86,9 @@ export const createTransaction = async (req: Request, res: Response) => {
         nameTransaction: validated.nameTransaction,
         price: validated.price,
         typeTransaction: validated.typeTransaction,
+        image: validated.image || "",
         transactionDate: validated.transactionDate ?? new Date(),
-        createdById: 12,
+        createdById: 1,
       },
     });
 
@@ -138,25 +140,14 @@ export const updateTransaction = async (req: Request, res: Response) => {
       });
     }
 
+    const data = removeUndefined(validated);
+
     const updateTransaction = await prisma.transaction.update({
       where: {
         id: idNumber,
       },
 
-      data: {
-        ...(validated.nameTransaction && {
-          nameTransaction: validated.nameTransaction,
-        }),
-        ...(validated.price !== undefined && {
-          price: validated.price,
-        }),
-        ...(validated.typeTransaction && {
-          typeTransaction: validated.typeTransaction,
-        }),
-        ...(validated.transactionDate && {
-          transactionDate: validated.transactionDate,
-        }),
-      },
+      data: data,
     });
 
     res.status(200).json({
