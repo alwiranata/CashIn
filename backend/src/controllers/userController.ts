@@ -1,8 +1,13 @@
 import { Request, Response } from "express";
-import { ZodError } from "zod";
+import { json, number, ZodError } from "zod";
 import { prisma } from "../lib/prisma";
-import { getUserEmailValidation, createUserValidation } from "../validations";
+import {
+  getUserEmailValidation,
+  createUserValidation,
+  updateUserValidation,
+} from "../validations";
 import bcrypt from "bcrypt";
+import { removeUndefined } from "../utils/removeUndefine";
 
 export const getUserEmail = async (req: Request, res: Response) => {
   try {
@@ -110,6 +115,72 @@ export const createUser = async (req: Request, res: Response) => {
     }
     return res.status(500).json({
       message: "Internal Server Error",
+    });
+  }
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({
+        message: "User ID is Required",
+      });
+    }
+
+    //validate input
+    const validate = updateUserValidation.parse(req.body);
+
+    //remove all undefined
+    const data = removeUndefined(validate);
+
+    //checking unique email
+    if (validate.email) {
+      const existingEmail = await prisma.user.findUnique({
+        where: { email: validate.email },
+      });
+
+      if (existingEmail) {
+        return res.status(400).json({
+          message: "Email already registered",
+        });
+      }
+    }
+
+    //hash
+    if (validate.password) {
+      data.password = await bcrypt.hash(validate.password, 10);
+    }
+
+    const userId = Number(id);
+
+    //update user
+    const user = await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: data,
+    });
+
+    return res.status(200).json({
+      message: "User update sucessfully ",
+      data: user,
+    });
+    
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        message: "Validation Error",
+        error: error.issues.map((err) => ({
+          field: err.path.join("."),
+          message: err.message,
+        })),
+      });
+    }
+
+    return res.status(500).json({
+      message: "Internal server error",
     });
   }
 };

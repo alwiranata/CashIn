@@ -1,4 +1,4 @@
-import z from "zod";
+import z, { email } from "zod";
 
 export const createUserValidation = z.object({
   name: z.string().min(1, "Name is required"),
@@ -10,6 +10,7 @@ export const createUserValidation = z.object({
 
 export const updateUserValidation = z.object({
   name: z.string().min(1, "Name is required").optional(),
+  email: z.string().email().optional(),
   password: z
     .string()
     .min(8, "Password must be at least 8 characters")
