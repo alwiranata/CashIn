@@ -5,6 +5,8 @@ import bcrypt from "bcrypt";
 import crypto from "crypto";
 import { ZodError } from "zod";
 import { transporter } from "../lib/mailer";
+import jwt from "jsonwebtoken";
+import { jwtConfig } from "../config/jwt";
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -41,7 +43,7 @@ export const register = async (req: Request, res: Response) => {
         activationExpiredAt: activationExpiredAt,
       },
     });
-    
+
     //send activationlink
     const activationLink = `${process.env.BASE_URL}/api/auth/activate/${activationToken}`;
     await transporter.sendMail({
@@ -164,9 +166,22 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
+    const token = jwt.sign(
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role,
+      },
+      jwtConfig.secret,
+      {
+        expiresIn: "1d",
+      }
+    );
+
     return res.status(200).json({
       message: "Login success",
       data: {
+        token: token,
         id: user.id,
         email: user.email,
         role: user.role,
