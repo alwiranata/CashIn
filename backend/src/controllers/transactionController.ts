@@ -1,4 +1,4 @@
-import { RequestHandler, Request, Response } from "express";
+import { RequestHandler } from "express";
 import {
   createTransactioValidation,
   updateTransactionValidation,
@@ -8,7 +8,7 @@ import { prisma } from "../lib/prisma";
 import { removeUndefined } from "../utils/removeUndefine";
 import { userRequest } from "../types/userRequest";
 
-export const getAllTransaction = async (req: Request, res: Response) => {
+export const getAllTransaction: RequestHandler = async (req, res) => {
   try {
     const transaction = await prisma.transaction.findMany();
 
@@ -33,7 +33,7 @@ export const getAllTransaction = async (req: Request, res: Response) => {
   }
 };
 
-export const getTransation = async (req: Request, res: Response) => {
+export const getTransation: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -78,7 +78,7 @@ export const getTransation = async (req: Request, res: Response) => {
   }
 };
 
-export const createTransaction: RequestHandler = async (req, res: Response) => {
+export const createTransaction: RequestHandler = async (req, res) => {
   try {
     const userReq = req as userRequest;
 
@@ -118,7 +118,7 @@ export const createTransaction: RequestHandler = async (req, res: Response) => {
   }
 };
 
-export const updateTransaction = async (req: Request, res: Response) => {
+export const updateTransaction: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -176,7 +176,7 @@ export const updateTransaction = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteTransaction = async (req: Request, res: Response) => {
+export const deleteTransaction: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 

@@ -1,5 +1,5 @@
-import { Request, Response } from "express";
-import { json, number, ZodError } from "zod";
+import { RequestHandler } from "express";
+import { ZodError } from "zod";
 import { prisma } from "../lib/prisma";
 import {
   getUserEmailValidation,
@@ -9,9 +9,9 @@ import {
 import bcrypt from "bcrypt";
 import { removeUndefined } from "../utils/removeUndefine";
 
-export const getUserEmail = async (req: Request, res: Response) => {
+export const getUserEmail: RequestHandler = async (req, res) => {
   try {
-    const findEmail = getUserEmailValidation.parse(req.body);
+    const findEmail = getUserEmailValidation.parse(req.query);
     if (!findEmail) {
       return res.status(400).json({
         message: "Email is required",
@@ -48,7 +48,7 @@ export const getUserEmail = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllUser = async (req: Request, res: Response) => {
+export const getAllUser: RequestHandler = async (req, res) => {
   try {
     const users = await prisma.user.findMany();
 
@@ -72,7 +72,7 @@ export const getAllUser = async (req: Request, res: Response) => {
   }
 };
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser: RequestHandler = async (req, res) => {
   try {
     const validated = createUserValidation.parse(req.body);
 
@@ -99,7 +99,7 @@ export const createUser = async (req: Request, res: Response) => {
       },
     });
 
-    return res.status(200).json({
+    return res.status(201).json({
       message: "User created sucessfully",
       data: user,
     });
@@ -119,7 +119,7 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
+export const updateUser: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -128,6 +128,9 @@ export const updateUser = async (req: Request, res: Response) => {
         message: "User ID is Required",
       });
     }
+
+    const userId = Number(id);
+
 
     //validate input
     const validate = updateUserValidation.parse(req.body);
@@ -141,7 +144,7 @@ export const updateUser = async (req: Request, res: Response) => {
         where: { email: validate.email },
       });
 
-      if (existingEmail) {
+      if (existingEmail && existingEmail.id !== userId) {
         return res.status(400).json({
           message: "Email already registered",
         });
@@ -153,7 +156,6 @@ export const updateUser = async (req: Request, res: Response) => {
       data.password = await bcrypt.hash(validate.password, 10);
     }
 
-    const userId = Number(id);
 
     //update user
     const user = await prisma.user.update({
@@ -184,7 +186,7 @@ export const updateUser = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
