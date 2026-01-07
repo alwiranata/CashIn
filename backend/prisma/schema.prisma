@@ -6,7 +6,7 @@ datasource db {
   provider = "postgresql"
 }
 
-enum Status {
+enum StatusUser {
   ACTIVE
   NONACTIVE
 }
@@ -16,9 +16,15 @@ enum Role {
   USER
 }
 
-enum typeTransaction {
+enum TypeTransaction {
   INCOME
   EXPENSE
+}
+
+enum StatusTask {
+  PENDING
+  PROGRES
+  DONE
 }
 
 //npx prisma formaat for clean code
@@ -28,7 +34,7 @@ model User {
   email               String        @unique
   password            String
   role                Role          @default(USER)
-  status              Status        @default(NONACTIVE)
+  status              StatusUser    @default(NONACTIVE)
   activationToken     String?       @unique
   activationExpiredAt DateTime?
   createdAt           DateTime      @default(now())
@@ -40,11 +46,19 @@ model Transaction {
   id              Int             @id @default(autoincrement())
   nameTransaction String
   price           Int
-  image          String?
-  typeTransaction typeTransaction
+  image           String?
+  typeTransaction TypeTransaction
   transactionDate DateTime        @default(now())
   createdAt       DateTime        @default(now())
   updateAt        DateTime        @updatedAt
   createdById     Int
   user            User            @relation(fields: [createdById], references: [id])
+}
+
+model Tasks {
+  id         Int        @id @default(autoincrement())
+  nameTask   String
+  image      String?
+  createddAt DateTime   @default(now())
+  status     StatusTask @default(PENDING)
 }
