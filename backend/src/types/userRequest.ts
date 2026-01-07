@@ -4,6 +4,6 @@ import { jwtPayloadSchema } from "../validations/jwtValidation";
 
 export type jwtPayload = z.infer<typeof jwtPayloadSchema>;
 
-export interface authenticatedRequest extends Request {
+export interface userRequest extends Request {
   user: jwtPayload;
 }

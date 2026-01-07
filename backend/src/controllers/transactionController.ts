@@ -6,7 +6,7 @@ import {
 import { ZodError } from "zod";
 import { prisma } from "../lib/prisma";
 import { removeUndefined } from "../utils/removeUndefine";
-import { authenticatedRequest } from "../types/authenticatedRequest";
+import { userRequest } from "../types/userRequest";
 
 export const getAllTransaction = async (req: Request, res: Response) => {
   try {
@@ -80,9 +80,9 @@ export const getTransation = async (req: Request, res: Response) => {
 
 export const createTransaction: RequestHandler = async (req, res: Response) => {
   try {
-    const authReq = req as authenticatedRequest;
+    const userReq = req as userRequest;
 
-    const validated = createTransactioValidation.parse(authReq.body);
+    const validated = createTransactioValidation.parse(userReq.body);
 
     const transaction = await prisma.transaction.create({
       data: {
@@ -91,7 +91,7 @@ export const createTransaction: RequestHandler = async (req, res: Response) => {
         typeTransaction: validated.typeTransaction,
         image: validated.image || "",
         transactionDate: validated.transactionDate ?? new Date(),
-        createdById: authReq.user.id,
+        createdById: userReq.user.id,
       },
     });
 
