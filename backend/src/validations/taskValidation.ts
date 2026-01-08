@@ -1,0 +1,9 @@
+import { z } from "zod";
+
+export const createTaskValidation = z.object({
+  nameTransaction: z.string().min(1, "Name transaction is required"),
+  image: z.string().optional(),
+  startTask: z.coerce.date().optional(),
+  finishTask: z.coerce.date().optional(),
+  statusTask: z.enum(["PENDING", "PROGRESS", "DONE"]),
+});

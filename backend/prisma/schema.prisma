@@ -23,7 +23,7 @@ enum TypeTransaction {
 
 enum StatusTask {
   PENDING
-  PROGRES
+  PROGRESS
   DONE
 }
 
@@ -40,6 +40,7 @@ model User {
   createdAt           DateTime      @default(now())
   updateAt            DateTime      @updatedAt
   transactions        Transaction[]
+  tasks               Task[]
 }
 
 model Transaction {
@@ -55,10 +56,15 @@ model Transaction {
   user            User            @relation(fields: [createdById], references: [id])
 }
 
-model Tasks {
-  id         Int        @id @default(autoincrement())
-  nameTask   String
-  image      String?
-  createddAt DateTime   @default(now())
-  status     StatusTask @default(PENDING)
+model Task {
+  id          Int        @id @default(autoincrement())
+  nameTask    String
+  image       String?
+  startTask   DateTime   @default(now())
+  finsishTask DateTime   @default(now())
+  status      StatusTask @default(PENDING)
+  createdAt   DateTime   @default(now())
+  updateAt    DateTime   @updatedAt
+  createdById Int
+  user        User       @relation(fields: [createdById], references: [id])
 }

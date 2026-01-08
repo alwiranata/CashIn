@@ -151,7 +151,7 @@ export const login = async (req: Request, res: Response) => {
 
     if (user.status === "NONACTIVE") {
       return res.status(403).json({
-        message: "Account is not active. Please contact admin",
+        message: "Account is not active. Please check your email or contact admin",
       });
     }
 
