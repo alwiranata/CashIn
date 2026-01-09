@@ -61,8 +61,8 @@ model Task {
   nameTask    String
   image       String?
   startTask   DateTime   @default(now())
-  finsishTask DateTime   @default(now())
-  status      StatusTask @default(PENDING)
+  finishTask  DateTime   @default(now())
+  statusTask      StatusTask @default(PENDING)
   createdAt   DateTime   @default(now())
   updateAt    DateTime   @updatedAt
   createdById Int
