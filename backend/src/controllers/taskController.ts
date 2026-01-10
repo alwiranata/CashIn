@@ -1,8 +1,50 @@
 import { RequestHandler } from "express";
-import { json, ZodError } from "zod";
+import { ZodError } from "zod";
 import { userRequest } from "../types/userRequest";
 import { createTaskValidation } from "../validations/taskValidation";
 import { prisma } from "../lib/prisma";
+
+export const getTaskById: RequestHandler = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({
+        message: "Invalid Task Id",
+      });
+    }
+
+    const task = await prisma.task.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!task) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: `Get task id ${id} successfully`,
+      data: task,
+    });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        message: "Validation error",
+        error: error.issues.map((err) => ({
+          field: err.path.join("."),
+          message: err.message,
+        })),
+      });
+    }
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
 
 export const getAllTask: RequestHandler = async (req, res) => {
   try {

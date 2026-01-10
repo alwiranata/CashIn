@@ -33,7 +33,7 @@ export const getAllTransaction: RequestHandler = async (req, res) => {
   }
 };
 
-export const getTransation: RequestHandler = async (req, res) => {
+export const getTransationById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 

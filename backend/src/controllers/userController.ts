@@ -9,9 +9,10 @@ import {
 import bcrypt from "bcrypt";
 import { removeUndefined } from "../utils/removeUndefine";
 
-export const getUserEmail: RequestHandler = async (req, res) => {
+export const getUserByEmail: RequestHandler = async (req, res) => {
   try {
     const findEmail = getUserEmailValidation.parse(req.query);
+
     if (!findEmail) {
       return res.status(400).json({
         message: "Email is required",
@@ -131,7 +132,6 @@ export const updateUser: RequestHandler = async (req, res) => {
 
     const userId = Number(id);
 
-
     //validate input
     const validate = updateUserValidation.parse(req.body);
 
@@ -155,7 +155,6 @@ export const updateUser: RequestHandler = async (req, res) => {
     if (validate.password) {
       data.password = await bcrypt.hash(validate.password, 10);
     }
-
 
     //update user
     const user = await prisma.user.update({
