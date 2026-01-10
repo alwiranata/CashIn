@@ -4,6 +4,30 @@ import { userRequest } from "../types/userRequest";
 import { createTaskValidation } from "../validations/taskValidation";
 import { prisma } from "../lib/prisma";
 
+export const getAllTask: RequestHandler = async (req, res) => {
+  try {
+    const tasks = await prisma.task.findMany();
+
+    return res.status(200).json({
+      message: "Get all task successfully",
+      data: tasks,
+    });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        message: "Validation Error",
+        error: error.issues.map((err) => ({
+          field: err.path.join("."),
+          message: err.message,
+        })),
+      });
+    }
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
 export const createTask: RequestHandler = async (req, res) => {
   try {
     const userReq = req as userRequest;
@@ -14,7 +38,7 @@ export const createTask: RequestHandler = async (req, res) => {
       data: {
         nameTask: validated.nameTask,
         image: validated.image || "",
-        statusTask: validated.statusTask ,
+        statusTask: validated.statusTask,
         startTask: validated.startTask ?? new Date(),
         finishTask: validated.finishTask ?? new Date(),
         createdById: userReq.user.id,
