@@ -112,15 +112,13 @@ export const createTask: RequestHandler = async (req, res) => {
   }
 };
 
-
 export const updateTask: RequestHandler = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-
     if (isNaN(id)) {
       return res.status(400).json({
-        message: "Transaction Id is required",
+        message: "Task Id is required",
       });
     }
     const findtask = await prisma.task.findUnique({
@@ -157,6 +155,54 @@ export const updateTask: RequestHandler = async (req, res) => {
         error: error.issues.map((err) => ({
           field: err.path.join("."),
           mesaage: err.message,
+        })),
+      });
+    }
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const deleteTask: RequestHandler = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({
+        message: "Task Id is Required",
+      });
+    }
+
+    const findTask = await prisma.task.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!findTask) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
+
+    const task = await prisma.task.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Delete task successfully",
+      data: task,
+    });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        message: "Validation error",
+        error: error.issues.map((err) => ({
+          field: err.path.join("."),
+          message: err.message,
         })),
       });
     }
