@@ -112,9 +112,11 @@ export const createTask: RequestHandler = async (req, res) => {
   }
 };
 
+
 export const updateTask: RequestHandler = async (req, res) => {
   try {
     const id = Number(req.params.id);
+
 
     if (isNaN(id)) {
       return res.status(400).json({

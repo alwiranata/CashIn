@@ -141,7 +141,7 @@ export const updateTransaction: RequestHandler = async (req, res) => {
         message: "Transaction not found",
       });
     }
-    
+
     const validated = updateTransactionValidation.parse(req.body);
     
     const data = removeUndefined(validated);
