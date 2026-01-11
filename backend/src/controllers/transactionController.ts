@@ -127,22 +127,23 @@ export const updateTransaction: RequestHandler = async (req, res) => {
         message: "Transaction ID is required",
       });
     }
-    const validated = updateTransactionValidation.parse(req.body);
-
+    
     const idNumber = Number(id);
-
+    
     const findTransaction = await prisma.transaction.findUnique({
       where: {
         id: idNumber,
       },
     });
-
+    
     if (!findTransaction) {
       return res.status(404).json({
         message: "Transaction not found",
       });
     }
-
+    
+    const validated = updateTransactionValidation.parse(req.body);
+    
     const data = removeUndefined(validated);
 
     const updateTransaction = await prisma.transaction.update({

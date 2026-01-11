@@ -1,8 +1,13 @@
 import { RequestHandler } from "express";
 import { ZodError } from "zod";
 import { userRequest } from "../types/userRequest";
-import { createTaskValidation } from "../validations/taskValidation";
+import {
+  createTaskValidation,
+  updateTaskValidation,
+} from "../validations/taskValidation";
 import { prisma } from "../lib/prisma";
+import { removeUndefined } from "../utils/removeUndefine";
+import { da } from "zod/v4/locales";
 
 export const getTaskById: RequestHandler = async (req, res) => {
   try {
@@ -98,6 +103,58 @@ export const createTask: RequestHandler = async (req, res) => {
         error: error.issues.map((err) => ({
           field: err.path.join,
           message: err.message,
+        })),
+      });
+    }
+    return res.status(500).json({
+      message: "Internal server error",
+    });
+  }
+};
+
+export const updateTask: RequestHandler = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+
+    if (isNaN(id)) {
+      return res.status(400).json({
+        message: "Transaction Id is required",
+      });
+    }
+    const findtask = await prisma.task.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!findtask) {
+      return res.status(404).json({
+        message: "Task not found",
+      });
+    }
+
+    const validate = await updateTaskValidation.parse(req.body);
+
+    const data = removeUndefined(validate);
+    const updateTask = await prisma.task.update({
+      where: {
+        id: id,
+      },
+
+      data: data,
+    });
+
+    return res.status(200).json({
+      message: "Created task successfully",
+      data: updateTask,
+    });
+  } catch (error) {
+    if (error instanceof ZodError) {
+      return res.status(400).json({
+        message: "Validation error",
+        error: error.issues.map((err) => ({
+          field: err.path.join("."),
+          mesaage: err.message,
         })),
       });
     }
