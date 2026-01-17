@@ -1,11 +1,8 @@
+import AppRouter from "./routes/appRouter";
 import "./App.css";
 
 function App() {
-  return (
-    <>
-      <div>halo</div>
-    </>
-  );
+  return <AppRouter />;
 }
 
 export default App;
