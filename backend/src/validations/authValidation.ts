@@ -8,5 +8,6 @@ export const registerValidation = z.object({
 
 export const loginValidation = z.object({
   email: z.string().email(),
-  password: z.string().min(1, "Password is required"),
+  password: z.string().min(1, "Password is Required"),
 });
+
