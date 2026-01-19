@@ -9,11 +9,11 @@ interface Props {
 const ProtectedRoute = ({ children }: Props) => {
   const token = getToken();
 
-  if (!token) {
+  if (!token || token === "undefined" || token === null) {
     return <Navigate to="/login" replace />;
   }
 
-  return <>{children}</>;
+  return children;
 };
 
 export default ProtectedRoute;

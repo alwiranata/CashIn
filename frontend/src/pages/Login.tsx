@@ -25,11 +25,8 @@ const Login = () => {
 
     try {
       const res = await loginApi(payload);
-
-      console.log("LOGIN RESPONSE:", res.data); // ⬅️ PENTING
-
-      // simpan token
-      setToken(res.data.token);
+      // simpan
+      setToken(res.data.data.token);
 
       // redirect ke dashboard
       navigate("/dashboard");
