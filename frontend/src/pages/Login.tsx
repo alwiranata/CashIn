@@ -57,7 +57,7 @@ const Login = () => {
 
         <p className="text-sm text-center mt-4">
           Belum punya akun?{" "}
-          <a href="/register" className="text-blue-600 font-semibold">
+          <a href="/register" className="text-indigo-600 font-semibold">
             Register
           </a>
         </p>

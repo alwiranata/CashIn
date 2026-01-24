@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from "react-router-dom";
 import { removeToken } from "@/utils/storage";
+import { useState } from "react";
 
 const menuClass = (isActive: boolean) =>
   `flex items-center gap-3 px-4 py-2 rounded-lg transition
@@ -28,6 +29,8 @@ type Props = {
 };
 
 const Sidebar = ({ isOpen, isMobile, onToggle, onClose }: Props) => {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const navigate = useNavigate();
 
   const logout = () => {
@@ -97,15 +100,60 @@ const Sidebar = ({ isOpen, isMobile, onToggle, onClose }: Props) => {
           ))}
 
           <button
-            onClick={logout}
+            onClick={() => setShowConfirm(true)}
             className="w-full flex items-center gap-3 px-4 py-2 rounded-lg
-                       text-red-400 hover:bg-red-600 hover:text-white transition"
+             text-red-400 hover:bg-red-600 hover:text-white transition"
           >
             <i className="bi bi-box-arrow-in-right text-lg" />
             {(isOpen || isMobile) && <span>Logout</span>}
           </button>
         </nav>
       </aside>
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-xl p-6 w-[90%] max-w-sm animate-scale">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Yakin ingin logout?
+            </h2>
+            <p className="text-sm text-gray-500 mt-2">
+              Anda akan keluar dari aplikasi.
+            </p>
+
+            <div className="flex justify-end gap-3 mt-6">
+              {/* TIDAK */}
+              <button
+                onClick={() => setShowConfirm(false)}
+                className="px-4 py-2 rounded-lg border text-gray-600 hover:bg-gray-100"
+              >
+                Tidak
+              </button>
+
+              {/* YA */}
+              <button
+                onClick={() => {
+                  setShowConfirm(false);
+                  setShowSuccess(true);
+
+                  setTimeout(() => {
+                    logout(); // fungsi logout kamu
+                  }, 1500);
+                }}
+                className="px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
+              >
+                Ya
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showSuccess && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 animate-slide">
+          <div className="bg-indigo-600 text-white px-5 py-3 rounded-lg shadow-lg flex items-center gap-2">
+            <i className="bi bi-check2 text-lg"></i>
+            <span>Berhasil logout</span>
+          </div>
+        </div>
+      )}
     </>
   );
 };
