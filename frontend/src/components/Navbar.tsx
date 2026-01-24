@@ -1,24 +1,27 @@
-import { useNavigate } from "react-router-dom";
-import { removeToken } from "@/utils/storage";
+type Props = {
+  isMobile: boolean;
+  onMenuClick: () => void;
+};
 
-const Navbar = () => {
-  const navigate = useNavigate();
-
-  const logout = () => {
-    removeToken();
-    navigate("/login");
-  };
-
+const Navbar = ({ isMobile, onMenuClick }: Props) => {
   return (
     <header className="h-16 bg-white shadow flex items-center justify-between px-6">
-      <h2 className="font-semibold">Dashboard</h2>
+      {isMobile && (
+        <button
+          onClick={onMenuClick}
+          className="text-2xl text-gray-700"
+        >
+         <i className="bi bi-list"></i>
+        </button>
+      )}
 
-      <button
-        onClick={logout}
-        className="bg-red-500 text-white px-4 py-1 rounded"
-      >
-        Logout
-      </button>
+      <div className="flex items-center gap-5 ml-auto">
+        <span>Admin</span>
+        <img
+          src="/profile.jpg"
+          className="w-10 h-10 rounded-full object-cover"
+        />
+      </div>
     </header>
   );
 };
