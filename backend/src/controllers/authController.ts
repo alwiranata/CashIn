@@ -151,13 +151,14 @@ export const login = async (req: Request, res: Response) => {
 
     if (user.status === "NONACTIVE") {
       return res.status(403).json({
-        message: "Account is not active. Please check your email or contact admin",
+        message:
+          "Account is not active. Please check your email or contact admin",
       });
     }
 
     const isPasswordValid = await bcrypt.compare(
       validated.password,
-      user.password
+      user.password,
     );
 
     if (!isPasswordValid) {
@@ -175,7 +176,7 @@ export const login = async (req: Request, res: Response) => {
       jwtConfig.secret,
       {
         expiresIn: "1d",
-      }
+      },
     );
 
     return res.status(200).json({
@@ -183,6 +184,7 @@ export const login = async (req: Request, res: Response) => {
       data: {
         token: token,
         id: user.id,
+        user: user.name,
         email: user.email,
         role: user.role,
         status: user.status,

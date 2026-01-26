@@ -5,6 +5,7 @@ import cors from "cors";
 dotenv.config();
 
 import router from "./routes";
+
 export const app = express();
 export const PORT = Number(process.env.PORT) || 3001;
 
@@ -14,7 +15,11 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.json());
+
+// 🔥 FIX RAW-BODY ERROR
+app.use(express.json({ limit: "10mb" }));
+app.use(express.urlencoded({ limit: "10mb", extended: true }));
+
 app.use("/api", router);
 
 export default app;
