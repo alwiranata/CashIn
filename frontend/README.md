@@ -1,190 +1,197 @@
-# Mantis Free React Material UI Dashboard Template [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Get%20Mantis%20Free%20React%20-%20The%20Most%20Beautiful%20Material-UI%20Designed%20Admin%20Dashboard%20Template%20&url=https://mantisdashboard.com/free&via=codedthemes&hashtags=react,materialui,nextjs,webdev,developers,typescript)
+# TailAdmin React - Free React Tailwind Admin Dashboard Template
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://github.com/codedthemes/mantis-free-react-admin-template/blob/master/LICENSE)
-[![GitHub package version](https://img.shields.io/github/package-json/v/codedthemes/mantis-free-react-admin-template)](https://github.com/codedthemes/mantis-free-react-admin-template/)
-[![Download ZIP](https://img.shields.io/badge/Download-ZIP-blue?style=flat-square&logo=github)](https://codedthemes.com/item/mantis-free-mui-admin-template/)
-[![Join Discord](https://img.shields.io/badge/Join-Discord-5865F2?style=flat-square&logo=discord&logoColor=white)](https://discord.com/invite/p2E2WhCb6s)
+TailAdmin is a free and open-source admin dashboard template built on **React and Tailwind CSS**, providing developers
+with everything they need to create a comprehensive, data-driven back-end,
+dashboard, or admin panel solution for upcoming web projects.
 
-Mantis is a free and open source React dashboard template made using the Material UI React component library with aim of flexibility and better customizability.
+With TailAdmin, you get access to all the necessary dashboard UI components, elements, and pages required to build a
+feature-rich and complete dashboard or admin panel. Whether you're building dashboard or admin panel for a complex web
+application or a simple website, TailAdmin is the perfect solution to help you get up and running quickly.
 
-### Name Derived From Nature
+![TailAdmin React.js Dashboard Preview](./banner.png)
 
-Mantis Logo is inspired from the insect name - 'Mantises' as they have triangular heads with flexible Necks. Also, the name is derived from two popular design systems, Material and Ant Design (M-Ant-is).
+## Overview
 
-Mantis has Ant Design principal on top of the Material UI React component library.
+TailAdmin provides essential UI components and layouts for building feature-rich, data-driven admin dashboards and
+control panels. It's built on:
 
-✨ Support us! If you like this theme, click the ⭐ (Top right) and let it shine
+- React 19
+- TypeScript
+- Tailwind CSS v4
 
-![mantis-free-react-dashboard-template.jpg](https://org-public-assets.s3.us-west-2.amazonaws.com/Free-Version-Banners/GITHUB-FREE-REACT-REPO+-+Mantis.png)
+### Quick Links
 
-## Table of contents
+- [✨ Visit Website](https://tailadmin.com)
+- [📄 Documentation](https://tailadmin.com/docs)
+- [⬇️ Download](https://tailadmin.com/download)
+- [🖌️ Figma Design File (Community Edition)](https://www.figma.com/community/file/1214477970819985778)
+- [⚡ Get PRO Version](https://tailadmin.com/pricing)
 
-- [Getting Started](#getting-started)
-- [Download](#download)
-- [Why Mantis?](#why-mantis)
-- [What's included in Premium Version?](#whats-included-in-premium-version)
-- [Documentation](#documentation)
-- [Browser support](#browser-support)
-- [Technology Stack](#technology-stack)
-- [Mantis Figma UI Kit](#mantis-figma-ui-kit)
-- [Other Technologies](#other-technologies)
-- 💰[Save more with Big Bundle](#save-more-with-big-bundle)💰
-- [More React Dashboard Templates](#more-react-dashboard-templates)
-- [Issues?](#issues)
-- [License](#license)
-- [Contributor](#contributor)
-- [Useful Resources](#useful-resources)
-- [Community](#community)
-- [Follow us](#follow-us)
+### Demos
 
-## Getting Started
+- [Free Version](https://free-react-demo.tailadmin.com/)
+- [Pro Version](https://react-demo.tailadmin.com)
 
-1. Clone from Github
+### Other Versions
 
-```
-git clone https://github.com/codedthemes/mantis-free-react-admin-template.git
-```
+- [HTML Version](https://github.com/TailAdmin/tailadmin-free-tailwind-dashboard-template)
+- [Next.js Version](https://github.com/TailAdmin/free-nextjs-admin-dashboard)
+- [Vue.js Version](https://github.com/TailAdmin/vue-tailwind-admin-dashboard)
+- [Angular Version](https://github.com/TailAdmin/free-angular-tailwind-dashboard)
+- [Laravel Version](https://github.com/TailAdmin/tailadmin-laravel)
 
-2. Install packages
+## Installation
 
-```
-yarn
-```
+### Prerequisites
 
-3. Run project
+To get started with TailAdmin, ensure you have the following prerequisites installed and set up:
 
-```
-yarn run start
+- Node.js 18.x or later (recommended to use Node.js 20.x or later)
+
+### Cloning the Repository
+
+Clone the repository using the following command:
+
+```bash
+git clone https://github.com/TailAdmin/free-react-tailwind-admin-dashboard.git
 ```
 
-## Download
+> Windows Users: place the repository near the root of your drive if you face issues while cloning.
 
-- Mantis Free
-  - [Live Preview](https://mantisdashboard.com/free/)
-  - [Download](https://codedthemes.com/item/mantis-free-mui-admin-template/)
-- Mantis Pro
-  - [Live Preview](https://mantisdashboard.com/)
-  - [Download](https://codedthemes.com/item/mantis-mui-react-dashboard-template/)
+1. Install dependencies:
 
-## Why Mantis?
+   ```bash
+   npm install
+   # or
+   yarn install
+   ```
 
-Mantis offers everything needed to build an advanced dashboard application. In the initial release, we included following high-end features,
+2. Start the development server:
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-- Support React19.
-- Professional user interface.
-- Material UI React components(MUI v7).
-- Fully responsive, all modern browser supported.
-- Easy to use code structure
-- Flexible & high-Performance code
-- Simple documentation
+## Components
 
-## What's included in Premium Version?
+TailAdmin is a pre-designed starting point for building a web-based dashboard using React.js and Tailwind CSS. The
+template includes:
 
-The [Pro version](https://mantisdashboard.com/) of Mantis react template includes features such as TypeScript, apps, authentication methods (i.e. JWT, Auth0, Firebase, AWS, Supabase), advance components, form plugins, layouts, widgets, and more.
+- Sophisticated and accessible sidebar
+- Data visualization components
+- Prebuilt profile management and 404 page
+- Tables and Charts(Line and Bar)
+- Authentication forms and input elements
+- Alerts, Dropdowns, Modals, Buttons and more
+- FAQ & Accordion, Testimonials, and Carousels
+- Can't forget Dark Mode 🕶️
 
-| [Mantis Free](https://mantisdashboard.com/free/)                                                     | [Mantis](https://mantisdashboard.com/)                                            |
-| ---------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------- |
-| **7** Demo pages                                                                                     | **85+** demo pages                                                                |
-| -                                                                                                    | ✓ Multi-language                                                                  |
-| -                                                                                                    | ✓ Dark/Light Mode 🌓                                                              |
-| -                                                                                                    | ✓ TypeScript version                                                              |
-| -                                                                                                    | ✓ Design files (Figma)                                                            |
-| -                                                                                                    | ✓ Multiple color options                                                          |
-| -                                                                                                    | ✓ RTL                                                                             |
-| -                                                                                                    | ✓ JWT authentications                                                             |
-| -                                                                                                    | ✓ [More components](https://mantisdashboard.com/components-overview/autocomplete) |
-| ✓ [MIT License](https://github.com/codedthemes/mantis-free-react-admin-template/blob/master/LICENSE) | ✓ [Pro License](https://mui.com/store/license/)                                   |
+All components are built with React and styled using Tailwind CSS for easy customization.
 
-## Documentation
+## Feature Comparison
 
-[Mantis documentation](https://codedthemes.gitbook.io/mantis) helps you out in all aspects from Installation to deployment.
+### Free Version
 
-## Browser support
+- 1 Unique Dashboard
+- 35+ dashboard components
+- 50+ UI elements
+- Basic Figma design files
+- Community support
 
-<img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/chrome.png" width="45" height="45" > <img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/edge.png" width="45" height="45" > <img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/safari.png" width="45" height="45" > <img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/firefox.png" width="45" height="45" > <img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/opera.png" width="45" height="45" >
+### Pro Version
 
-## Technology Stack
+- 7 Unique Dashboards: Analytics, Ecommerce, Marketing, CRM, SaaS, Stocks, Logistics (more coming soon)
+- 500+ dashboard components and UI elements
+- Complete Figma design file
+- Email support
 
-- Material UI V7
-- Built with React Hooks API.
-- React context API for state management.
-- SWR.
-- React Router for navigation routing.
-- Support for Vite.
-- Code splitting.
-- CSS-in-JS.
+To learn more about pro version features and pricing, visit our [pricing page](https://tailadmin.com/pricing).
 
-## Mantis Figma UI Kit
+## Changelog
 
-| FREE                                                                                                                        | PRO                                                                                                                       |
-| --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-|  <a href="https://codedthemes.com/item/mantis-free-figma-ui-kit/" traget="_blank"><img src="https://org-public-assets.s3.us-west-2.amazonaws.com/Banners/Figma_Free_Mantis.png" width="450" alt="Figma Free"></a> | <a href="https://codedthemes.com/item/mantis-figma-ui-kit/" traget="_blank"><img src="https://org-public-assets.s3.us-west-2.amazonaws.com/Banners/Figma_Pro_Mantis.png" width="450" alt="Figma Pro"></a> |
+### Version 2.1.0 - [Dec 30, 2025]
 
-## Other Technologies
+- Resolved Date Picker positioning and input issues in Charts.
 
-| Technology                                                                                                                        | Free                                                                               | Pro                                                                       |
-| --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| <p align="center"><img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/Angular.png" width="25" height="25"></p>   | [**Free**](https://codedthemes.com/item/mantis-angular-free-admin-template/)       | [**Pro**](https://codedthemes.com/item/mantis-angular-admin-template/)    |
-| <p align="center"><img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/Bootstrap.png" width="30" height="30"></p> | [**Free**](https://codedthemes.com/item/mantis-bootstrap-free-admin-template/)     | [**Pro**](https://codedthemes.com/item/mantis-bootstrap-admin-dashboard/) |
-| <p align="center"><img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/Vue.png" width="25" height="25"></p>       | [**Free**](https://codedthemes.com/item/mantis-free-vuetify-vuejs-admin-template/) | [**Pro**](https://codedthemes.com/item/mantis-vue-admin-template/)        |
+### Version 2.0.2 - [March 25, 2025]
 
-## Save more with Big Bundle
+- Upgraded to React 19
+- Included overrides for packages to prevent peer dependency errors.
+- Migrated from react-flatpickr to flatpickr package for React 19 support
 
-[![bundle-image](https://org-public-assets.s3.us-west-2.amazonaws.com/Banners/Bundle+banner.png)](https://links.codedthemes.com/jhFBJ)
+### Version 2.0.1 - [February 27, 2025]
 
-## More React Dashboard Templates
+#### Update Overview
 
-| Dashboard                                                                                                                                                          | FREE                                                                                | PRO                                                                                   |
-| ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| <img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/Berry%20with%20name.png"  height="30" style="display:inline-block; vertical-align:middle;">   | [**Free**](https://codedthemes.com/item/berry-mui-free-react-admin-template/)       | [**Pro**](https://codedthemes.com/item/berry-material-react-admin-template/)</span>   |
-| <img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/Datta%20with%20name.png" height="30" style="display:inline-block; vertical-align:middle;">    | [**Free**](https://codedthemes.com/item/datta-able-react-free-admin-template/)      | [**Pro**](https://codedthemes.com/item/datta-able-react-admin-template/)</span>       |
-| <img src="https://org-public-assets.s3.us-west-2.amazonaws.com/logos/Gradient%20with%20name.png" height="30" style="display:inline-block; vertical-align:middle;"> | [**Free**](https://codedthemes.com/item/gradient-able-reactjs-free-admin-template/) | [**Pro**](https://codedthemes.com/item/gradient-able-reactjs-admin-dashboard/)</span> |
+- Upgraded to Tailwind CSS v4 for better performance and efficiency.
+- Updated class usage to match the latest syntax and features.
+- Replaced deprecated class and optimized styles.
 
-## Issues
+#### Next Steps
 
-Please generate a [Github issue](https://github.com/codedthemes/mantis-free-react-admin-template/issues) if you found a bug in any version. We are try our best to resolve the issue.
+- Run npm install or yarn install to update dependencies.
+- Check for any style changes or compatibility issues.
+- Refer to the Tailwind CSS v4 [Migration Guide](https://tailwindcss.com/docs/upgrade-guide) on this release. if needed.
+- This update keeps the project up to date with the latest Tailwind improvements. 🚀
+
+### Version 2.0.0 - [February 2025]
+
+A major update with comprehensive redesign and modern React patterns implementation.
+
+#### Major Improvements
+
+- Complete UI redesign with modern React patterns
+- New features: collapsible sidebar, chat, and calendar
+- Improved performance and accessibility
+- Updated data visualization using ApexCharts
+
+#### Key Features
+
+- Redesigned dashboards (Ecommerce, Analytics, Marketing, CRM)
+- Enhanced navigation with React Router integration
+- Advanced tables with sorting and filtering
+- Calendar with drag-and-drop support
+- New UI components and improved existing ones
+
+#### Breaking Changes
+
+- Updated sidebar component API
+- Migrated charts to ApexCharts
+- Revised authentication system
+
+[Read more](https://tailadmin.com/docs/update-logs/react) on this release.
+
+### Version 1.3.7 - [June 20, 2024]
+
+#### Enhancements
+
+1. Remove Repetition of DefaultLayout in every Pages
+2. Add ClickOutside Component for reduce repeated functionality in Header Message, Notification and User Dropdowns.
+
+### Version 1.3.6 - [Jan 31, 2024]
+
+#### Enhancements
+
+1. Integrate flatpickr in [Date Picker/Form Elements]
+2. Change color after select an option [Select Element/Form Elements].
+3. Make it functional [Multiselect Dropdown/Form Elements].
+4. Make best value editable [Pricing Table One/Pricing Table].
+5. Rearrange Folder structure.
+
+### Version 1.2.0 - [Apr 28, 2023]
+
+- Add Typescript in TailAdmin React.
+
+### Version 1.0.0 - Initial Release - [Mar 13, 2023]
+
+- Initial release of TailAdmin React.
 
 ## License
 
-- Licensed under [MIT](https://github.com/codedthemes/mantis-free-react-admin-template/blob/master/LICENSE)
-- Copyright © [CodedThemes](https://codedthemes.com/)
+TailAdmin React.js Free Version is released under the MIT License.
 
-## Contributor
+## Support
 
-**CodedThemes Team**
-
-- https://x.com/codedthemes
-- https://github.com/codedthemes
-
-**Rakesh Nakrani**
-
-- https://x.com/rakesh_nakrani
-
-**Brijesh Dobariya**
-
-- https://x.com/dobaria_brijesh
-
-## Useful Resources
-
-- [More Admin Templates From CodedThemes](https://codedthemes.com/item/category/admin-templates/)
-- [Freebies From CodedThemes](https://codedthemes.com/item/category/free-templates/)
-- [Big Bundles](https://codedthemes.com/item/big-bundle/)
-- [Figma UI Kits](https://codedthemes.com/item/category/templates/figma/)
-- [Affiliate Program](https://codedthemes.com/affiliate/)
-- [Blogs](https://blog.codedthemes.com/)
-
-## Community
-
-- 👥Follow [@codedThemes](https://x.com/codedthemes)
-- 🔗Join [Discord](https://discord.com/invite/p2E2WhCb6s)
-- 🔔Subscribe to [CodedTheme Blogs](https://blog.codedthemes.com/)
-
-## Follow Us
-
-- [Twitter](https://twitter.com/codedthemes) 🐦
-- [Dribbble](https://dribbble.com/codedthemes) 🏀
-- [Github](https://github.com/codedthemes) 🐙
-- [LinkedIn](https://www.linkedin.com/company/codedthemes/) 💼
-- [Instagram](https://www.instagram.com/codedthemes/) 📷
-- [Facebook](https://www.facebook.com/codedthemes) 🟦
+If you find this project helpful, please consider giving it a star on GitHub. Your support helps us continue developing
+and maintaining this template.
