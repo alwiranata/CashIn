@@ -3,7 +3,9 @@ import SignIn from "./pages/AuthPages/SignIn";
 import SignUp from "./pages/AuthPages/SignUp";
 import NotFound from "./pages/OtherPage/NotFound";
 import UserProfiles from "./pages/UserProfiles";
-import BasicTables from "./pages/Tables/BasicTables";
+import Tasks from "./pages/Tables/Tasks";
+import Transactions from "./pages/Tables/Transactions";
+import Users from "./pages/Tables/Users";
 import FormElements from "./pages/Forms/FormElements";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
@@ -26,13 +28,13 @@ export default function App() {
             <Route path="/form-elements" element={<FormElements />} />
 
             {/* tasks */}
-            <Route path="/basic-tables" element={<BasicTables />} />
+            <Route path="/task-tables" element={<Tasks />} />
             
             {/* transactions */}
-            <Route path="/basic-tables" element={<BasicTables />} />
+            <Route path="/transaction-tables" element={<Transactions />} />
 
             {/* users */}
-            <Route path="/basic-tables" element={<BasicTables />} />
+            <Route path="/user-tables" element={<Users />} />
 
 
           </Route>

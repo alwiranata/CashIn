@@ -29,17 +29,17 @@ const navItems: NavItem[] = [
   {
     name: "Tasks",
     icon: <TaskIcon/>,
-    subItems: [{ name: "Task", path: "/basic-tables", pro: false }],
+    subItems: [{ name: "Task", path: "/task-tables", pro: false }],
   },
   {
     name: "Transactions",
     icon: <DollarLineIcon />,
-    subItems: [{ name: "Transaction", path: "/basic-tables", pro: false }],
+    subItems: [{ name: "Transaction", path: "/transaction-tables", pro: false }],
   },
   {
     name: "Users",
     icon: <UserIcon />,
-    subItems: [{ name: "User", path: "/basic-tables", pro: false }],
+    subItems: [{ name: "User", path: "/user-tables", pro: false }],
   },
 ];
 
