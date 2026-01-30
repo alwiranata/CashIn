@@ -48,7 +48,7 @@ export default function TasksTable() {
   ======================= */
   const fetchTasks = async () => {
     try {
-      const token = localStorage.getItem("token"); // sesuaikan key token kamu
+      const token = localStorage.getItem("token");
 
       const res = await fetch("http://localhost:3000/api/task/getAll", {
         headers: {
@@ -93,11 +93,10 @@ export default function TasksTable() {
   };
 
   /* =======================
-     EDIT TASK (sementara)
+     EDIT TASK
   ======================= */
   const handleEdit = (task: Task) => {
     alert(`Edit Task: ${task.nameTask}`);
-    // nanti bisa dibuat modal edit
   };
 
   /* =======================
@@ -110,7 +109,11 @@ export default function TasksTable() {
   };
 
   if (loading) {
-    return <div className="p-5">Loading tasks...</div>;
+    return (
+      <div className="p-5 text-gray-500 dark:text-gray-400">
+        Loading tasks...
+      </div>
+    );
   }
 
   return (
@@ -120,27 +123,23 @@ export default function TasksTable() {
           {/* ================= HEADER ================= */}
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell isHeader className="px-5 py-3 text-start">
-                No
-              </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-start">
-                Task Name
-              </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-start">
-                Start
-              </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-start">
-                Finish
-              </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-start">
-                Status
-              </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-start">
-                Image
-              </TableCell>
-              <TableCell isHeader className="px-5 py-3 text-start">
-                Action
-              </TableCell>
+              {[
+                "No",
+                "Task Name",
+                "Start",
+                "Finish",
+                "Status",
+                "Image",
+                "Action",
+              ].map((title) => (
+                <TableCell
+                  key={title}
+                  isHeader
+                  className="px-5 py-3 text-start text-gray-500 text-theme-xs font-medium dark:text-gray-400"
+                >
+                  {title}
+                </TableCell>
+              ))}
             </TableRow>
           </TableHeader>
 
@@ -148,34 +147,28 @@ export default function TasksTable() {
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {tasks.map((task, index) => (
               <TableRow key={task.id}>
-                {/* ID */}
-                <TableCell className="px-4 py-3 text-start">
+                <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
                   {index + 1}
                 </TableCell>
 
-                {/* TASK NAME */}
-                <TableCell className="px-4 py-3 text-start">
+                <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
                   {task.nameTask}
                 </TableCell>
 
-                {/* START */}
-                <TableCell className="px-4 py-3 text-start">
+                <TableCell className="px-4 py-3 text-start text-gray-500 dark:text-gray-200">
                   {new Date(task.startTask).toLocaleDateString()}
                 </TableCell>
 
-                {/* FINISH */}
-                <TableCell className="px-4 py-3 text-start">
+                <TableCell className="px-4 py-3 text-start text-gray-500 dark:text-gray-200">
                   {new Date(task.finishTask).toLocaleDateString()}
                 </TableCell>
 
-                {/* STATUS */}
                 <TableCell className="px-4 py-3 text-start">
                   <Badge size="sm" color={renderStatusColor(task.statusTask)}>
                     {task.statusTask}
                   </Badge>
                 </TableCell>
 
-                {/* Image */}
                 <TableCell className="px-4 py-3 text-start">
                   <button
                     onClick={() => setPreviewImage(task.image ?? null)}
@@ -185,7 +178,6 @@ export default function TasksTable() {
                   </button>
                 </TableCell>
 
-                {/* ACTION */}
                 <TableCell className="px-4 py-3 text-start">
                   <div className="flex gap-2">
                     <button
@@ -208,7 +200,7 @@ export default function TasksTable() {
 
             {tasks.length === 0 && (
               <TableRow>
-                <TableCell className="text-center py-6 text-gray-400">
+                <TableCell className="text-center py-6 text-gray-400 dark:text-gray-500">
                   No tasks found
                 </TableCell>
               </TableRow>
@@ -216,11 +208,12 @@ export default function TasksTable() {
           </TableBody>
         </Table>
       </div>
+
       {/* ================= IMAGE PREVIEW MODAL ================= */}
       {previewImage &&
         createPortal(
           <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50">
-            <div className="bg-white rounded-xl shadow-xl p-4 max-w-md w-full relative">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-4 max-w-md w-full relative">
               <button
                 onClick={() => setPreviewImage(null)}
                 className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
