@@ -1,3 +1,6 @@
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
+
 import {
   Table,
   TableBody,
@@ -8,215 +11,232 @@ import {
 
 import Badge from "../../ui/badge/Badge";
 
-interface Order {
+/* =======================
+   TYPES
+======================= */
+
+type StatusTask = "PENDING" | "PROGRESS" | "DONE";
+
+interface Task {
   id: number;
-  user: {
-    image: string;
-    name: string;
-    role: string;
-  };
-  projectName: string;
-  team: {
-    images: string[];
-  };
-  status: string;
-  budget: string;
+  nameTask: string;
+  image: string | null;
+  startTask: string;
+  finishTask: string;
+  statusTask: StatusTask;
+  createdById: number;
+  createdAt: string;
+  updateAt: string;
 }
 
-// Define the table data using the interface
-const tableData: Order[] = [
-  {
-    id: 1,
-    user: {
-      image: "/images/user/user-17.jpg",
-      name: "Lindsey Curtis",
-      role: "Web Designer",
-    },
-    projectName: "Agency Website",
-    team: {
-      images: [
-        "/images/user/user-22.jpg",
-        "/images/user/user-23.jpg",
-        "/images/user/user-24.jpg",
-      ],
-    },
-    budget: "3.9K",
-    status: "Active",
-  },
-  {
-    id: 2,
-    user: {
-      image: "/images/user/user-18.jpg",
-      name: "Kaiya George",
-      role: "Project Manager",
-    },
-    projectName: "Technology",
-    team: {
-      images: ["/images/user/user-25.jpg", "/images/user/user-26.jpg"],
-    },
-    budget: "24.9K",
-    status: "Pending",
-  },
-  {
-    id: 3,
-    user: {
-      image: "/images/user/user-17.jpg",
-      name: "Zain Geidt",
-      role: "Content Writing",
-    },
-    projectName: "Blog Writing",
-    team: {
-      images: ["/images/user/user-27.jpg"],
-    },
-    budget: "12.7K",
-    status: "Active",
-  },
-  {
-    id: 4,
-    user: {
-      image: "/images/user/user-20.jpg",
-      name: "Abram Schleifer",
-      role: "Digital Marketer",
-    },
-    projectName: "Social Media",
-    team: {
-      images: [
-        "/images/user/user-28.jpg",
-        "/images/user/user-29.jpg",
-        "/images/user/user-30.jpg",
-      ],
-    },
-    budget: "2.8K",
-    status: "Cancel",
-  },
-  {
-    id: 5,
-    user: {
-      image: "/images/user/user-21.jpg",
-      name: "Carla George",
-      role: "Front-end Developer",
-    },
-    projectName: "Website",
-    team: {
-      images: [
-        "/images/user/user-31.jpg",
-        "/images/user/user-32.jpg",
-        "/images/user/user-33.jpg",
-      ],
-    },
-    budget: "4.5K",
-    status: "Active",
-  },
-];
+interface ApiResponse {
+  message: string;
+  data: Task[];
+}
+
+/* =======================
+   COMPONENT
+======================= */
 
 export default function TasksTable() {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
+
+  /* =======================
+     FETCH TASK
+  ======================= */
+  const fetchTasks = async () => {
+    try {
+      const token = localStorage.getItem("token"); // sesuaikan key token kamu
+
+      const res = await fetch("http://localhost:3000/api/task/getAll", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error("Unauthorized / Failed Fetch");
+      }
+
+      const json: ApiResponse = await res.json();
+      setTasks(json.data || []);
+    } catch (error) {
+      console.error("Failed fetch task:", error);
+      alert("Gagal mengambil data task (Unauthorized)");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  /* =======================
+     DELETE TASK
+  ======================= */
+  const handleDelete = async (id: number) => {
+    if (!confirm("Yakin mau hapus task ini?")) return;
+
+    try {
+      await fetch(`http://localhost:3000/api/task/delete/${id}`, {
+        method: "DELETE",
+      });
+
+      fetchTasks();
+    } catch (error) {
+      console.error(error);
+      alert("Gagal hapus task");
+    }
+  };
+
+  /* =======================
+     EDIT TASK (sementara)
+  ======================= */
+  const handleEdit = (task: Task) => {
+    alert(`Edit Task: ${task.nameTask}`);
+    // nanti bisa dibuat modal edit
+  };
+
+  /* =======================
+     STATUS COLOR
+  ======================= */
+  const renderStatusColor = (status: StatusTask) => {
+    if (status === "DONE") return "success";
+    if (status === "PROGRESS") return "warning";
+    return "error";
+  };
+
+  if (loading) {
+    return <div className="p-5">Loading tasks...</div>;
+  }
+
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
       <div className="max-w-full overflow-x-auto">
         <Table>
-          {/* Table Header */}
+          {/* ================= HEADER ================= */}
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              <TableCell
-                isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
-                User
+              <TableCell isHeader className="px-5 py-3 text-start">
+                No
               </TableCell>
-              <TableCell
-                isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
-                Project Name
+              <TableCell isHeader className="px-5 py-3 text-start">
+                Task Name
               </TableCell>
-              <TableCell
-                isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
-                Team
+              <TableCell isHeader className="px-5 py-3 text-start">
+                Start
               </TableCell>
-              <TableCell
-                isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
+              <TableCell isHeader className="px-5 py-3 text-start">
+                Finish
+              </TableCell>
+              <TableCell isHeader className="px-5 py-3 text-start">
                 Status
               </TableCell>
-              <TableCell
-                isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
-              >
-                Budget
+              <TableCell isHeader className="px-5 py-3 text-start">
+                Image
+              </TableCell>
+              <TableCell isHeader className="px-5 py-3 text-start">
+                Action
               </TableCell>
             </TableRow>
           </TableHeader>
 
-          {/* Table Body */}
+          {/* ================= BODY ================= */}
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {tableData.map((order) => (
-              <TableRow key={order.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 overflow-hidden rounded-full">
-                      <img
-                        width={40}
-                        height={40}
-                        src={order.user.image}
-                        alt={order.user.name}
-                      />
-                    </div>
-                    <div>
-                      <span className="block font-medium text-gray-800 text-theme-sm dark:text-white/90">
-                        {order.user.name}
-                      </span>
-                      <span className="block text-gray-500 text-theme-xs dark:text-gray-400">
-                        {order.user.role}
-                      </span>
-                    </div>
-                  </div>
+            {tasks.map((task, index) => (
+              <TableRow key={task.id}>
+                {/* ID */}
+                <TableCell className="px-4 py-3 text-start">
+                  {index + 1}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  {order.projectName}
+
+                {/* TASK NAME */}
+                <TableCell className="px-4 py-3 text-start">
+                  {task.nameTask}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <div className="flex -space-x-2">
-                    {order.team.images.map((teamImage, index) => (
-                      <div
-                        key={index}
-                        className="w-6 h-6 overflow-hidden border-2 border-white rounded-full dark:border-gray-900"
-                      >
-                        <img
-                          width={24}
-                          height={24}
-                          src={teamImage}
-                          alt={`Team member ${index + 1}`}
-                          className="w-full size-6"
-                        />
-                      </div>
-                    ))}
-                  </div>
+
+                {/* START */}
+                <TableCell className="px-4 py-3 text-start">
+                  {new Date(task.startTask).toLocaleDateString()}
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                  <Badge
-                    size="sm"
-                    color={
-                      order.status === "Active"
-                        ? "success"
-                        : order.status === "Pending"
-                        ? "warning"
-                        : "error"
-                    }
-                  >
-                    {order.status}
+
+                {/* FINISH */}
+                <TableCell className="px-4 py-3 text-start">
+                  {new Date(task.finishTask).toLocaleDateString()}
+                </TableCell>
+
+                {/* STATUS */}
+                <TableCell className="px-4 py-3 text-start">
+                  <Badge size="sm" color={renderStatusColor(task.statusTask)}>
+                    {task.statusTask}
                   </Badge>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                  {order.budget}
+
+                {/* Image */}
+                <TableCell className="px-4 py-3 text-start">
+                  <button
+                    onClick={() => setPreviewImage(task.image ?? null)}
+                    className="px-3 py-1 text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
+                  >
+                    <i className="bi bi-eye"></i>
+                  </button>
+                </TableCell>
+
+                {/* ACTION */}
+                <TableCell className="px-4 py-3 text-start">
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => handleEdit(task)}
+                      className="px-3 py-1 text-sm rounded bg-blue-500 text-white hover:bg-blue-600"
+                    >
+                      <i className="bi bi-pencil-square"></i>
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(task.id)}
+                      className="px-3 py-1 text-sm rounded bg-red-500 text-white hover:bg-red-600"
+                    >
+                      <i className="bi bi-trash3"></i>
+                    </button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
+
+            {tasks.length === 0 && (
+              <TableRow>
+                <TableCell className="text-center py-6 text-gray-400">
+                  No tasks found
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
+      {/* ================= IMAGE PREVIEW MODAL ================= */}
+      {previewImage &&
+        createPortal(
+          <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50">
+            <div className="bg-white rounded-xl shadow-xl p-4 max-w-md w-full relative">
+              <button
+                onClick={() => setPreviewImage(null)}
+                className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
+              >
+                ✕
+              </button>
+
+              <img
+                src={previewImage}
+                alt="Preview"
+                className="w-full h-auto rounded-lg object-contain"
+              />
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

@@ -9,6 +9,8 @@ import Users from "./pages/Tables/Users";
 import FormElements from "./pages/Forms/FormElements";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
+import "bootstrap-icons/font/bootstrap-icons.css";
+
 import Home from "./pages/Dashboard/Home";
 
 export default function App() {
@@ -29,14 +31,12 @@ export default function App() {
 
             {/* tasks */}
             <Route path="/task-tables" element={<Tasks />} />
-            
+
             {/* transactions */}
             <Route path="/transaction-tables" element={<Transactions />} />
 
             {/* users */}
             <Route path="/user-tables" element={<Users />} />
-
-
           </Route>
 
           {/* Auth Layout */}
