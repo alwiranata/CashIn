@@ -9,44 +9,43 @@ import Users from "./pages/Tables/Users";
 import FormElements from "./pages/Forms/FormElements";
 import AppLayout from "./layout/AppLayout";
 import { ScrollToTop } from "./components/common/ScrollToTop";
-import "bootstrap-icons/font/bootstrap-icons.css";
-
+import ProtectedRoute from "./routes/ProtectedRoute";
 import Home from "./pages/Dashboard/Home";
+
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 export default function App() {
   return (
-    <>
-      <Router>
-        <ScrollToTop />
-        <Routes>
-          {/* Dashboard Layout */}
-          <Route element={<AppLayout />}>
-            <Route index path="/" element={<Home />} />
+    <Router>
+      <ScrollToTop />
 
-            {/* Others Page */}
-            <Route path="/profile" element={<UserProfiles />} />
+      <Routes>
+        {/* ================= AUTH ROUTES ================= */}
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signup" element={<SignUp />} />
+
+        {/* ================= PROTECTED ROUTES ================= */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AppLayout />}>
+            {/* Dashboard */}
+            <Route index element={<Home />} />
+
+            {/* Others */}
+            <Route path="profile" element={<UserProfiles />} />
 
             {/* Forms */}
-            <Route path="/form-elements" element={<FormElements />} />
+            <Route path="form-elements" element={<FormElements />} />
 
-            {/* tasks */}
-            <Route path="/task-tables" element={<Tasks />} />
-
-            {/* transactions */}
-            <Route path="/transaction-tables" element={<Transactions />} />
-
-            {/* users */}
-            <Route path="/user-tables" element={<Users />} />
+            {/* Tables */}
+            <Route path="task-tables" element={<Tasks />} />
+            <Route path="transaction-tables" element={<Transactions />} />
+            <Route path="user-tables" element={<Users />} />
           </Route>
+        </Route>
 
-          {/* Auth Layout */}
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-
-          {/* Fallback Route */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
-    </>
+        {/* ================= FALLBACK ================= */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Router>
   );
 }

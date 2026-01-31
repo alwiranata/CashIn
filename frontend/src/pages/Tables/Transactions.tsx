@@ -7,8 +7,7 @@ export default function Transactions() {
   return (
     <>
       <PageMeta
-        title="React.js Basic Tables Dashboard | NoteFlow - Next.js Admin Dashboard Template"
-        description="This is React.js Basic Tables Dashboard page for NoteFlow - React.js Tailwind CSS Admin Dashboard Template"
+      title=""
       />
       <PageBreadcrumb pageTitle="Trsnsactions" />
       <div className="space-y-6">

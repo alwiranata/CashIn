@@ -176,7 +176,7 @@ export default function SignUpForm() {
           </button>
         </form>
 
-        <p className="mt-5 text-sm text-gray-700 dark:text-gray-400">
+        <p className="mt-5 text-sm text-center text-gray-700 dark:text-gray-400">
           Already have an account?{" "}
           <Link to="/signin" className="text-brand-500">
             Sign In
