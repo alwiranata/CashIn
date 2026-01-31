@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, RequestHandler, Response } from "express";
 import { prisma } from "../lib/prisma";
 import { registerValidation, loginValidation } from "../validations";
 import bcrypt from "bcrypt";
@@ -8,7 +8,7 @@ import { transporter } from "../lib/mailer";
 import jwt from "jsonwebtoken";
 import { jwtConfig } from "../config/jwt";
 
-export const register = async (req: Request, res: Response) => {
+export const register: RequestHandler = async (req, res) => {
   try {
     //validate input
     const validated = registerValidation.parse(req.body);
@@ -45,11 +45,13 @@ export const register = async (req: Request, res: Response) => {
     });
 
     //send activationlink
+
     const activationLink = `${process.env.BASE_URL}/api/auth/activate/${activationToken}`;
-    await transporter.sendMail({
-      to: user.email,
-      subject: "Activate your CashIn account",
-      html: `
+    transporter
+      .sendMail({
+        to: user.email,
+        subject: "Activate your CashIn account",
+        html: `
   <div style="font-family: Arial, sans-serif; background-color:#f4f6f8; padding:30px;">
     <div style="max-width:600px; margin:auto; background:#ffffff; border-radius:8px; overflow:hidden;">
       
@@ -105,7 +107,11 @@ export const register = async (req: Request, res: Response) => {
     </div>
   </div>
   `,
-    });
+      })
+      .catch((err) => {
+        console.log("Email failed (ignored):", err.message);
+      });
+
     //response
     return res.status(201).json({
       message: "Regsiter Succes",
@@ -135,7 +141,7 @@ export const register = async (req: Request, res: Response) => {
   }
 };
 
-export const login = async (req: Request, res: Response) => {
+export const login: RequestHandler = async (req, res) => {
   try {
     const validated = loginValidation.parse(req.body);
 
@@ -194,16 +200,17 @@ export const login = async (req: Request, res: Response) => {
     if (error instanceof ZodError) {
       return res.status(400).json({
         message: "Validation Error",
+        // Gunakan "errors" (pake s) biar konsisten dengan register
         errors: error.issues.map((err) => ({
           field: err.path.join("."),
-          error: error,
+          message: err.message, // <--- AMBIL MESSAGE-NYA SAJA
         })),
       });
     }
 
     return res.status(500).json({
       message: "Internal Server Error",
-      error: error,
+      error: error instanceof Error ? error.message : error,
     });
   }
 };

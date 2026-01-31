@@ -41,7 +41,7 @@ export const jwtMiddleware = (
       return res.status(400).json({
         message: "Validation Error",
         error: error.issues.map((err) => ({
-          error: err.path.join(""),
+          error: err.path.join("."),
           message: err.message,
         })),
       });
