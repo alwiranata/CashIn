@@ -8,6 +8,8 @@ import {
 } from "../validations";
 import bcrypt from "bcrypt";
 import { removeUndefined } from "../utils/removeUndefine";
+import jwt from "jsonwebtoken";
+import { jwtConfig } from "../config/jwt";
 
 export const getUserByEmail: RequestHandler = async (req, res) => {
   try {
@@ -164,10 +166,24 @@ export const updateUser: RequestHandler = async (req, res) => {
       data: data,
     });
 
+    // 🔥 JWT BARU
+    const newToken = jwt.sign(
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+      },
+      jwtConfig.secret,
+      { expiresIn: "1d" },
+    );
+
     return res.status(200).json({
       message: "User update sucessfully ",
       data: user,
+      token: newToken, // ⬅️ INI PENTING
     });
+    
   } catch (error) {
     if (error instanceof ZodError) {
       return res.status(400).json({
