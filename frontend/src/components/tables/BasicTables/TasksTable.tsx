@@ -42,10 +42,25 @@ export default function TasksTable() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   /* =======================
      FETCH TASK
   ======================= */
+  // Ambil nama file dari path / base64
+  function getFileName(pathOrBase64: string) {
+    // Kalau base64, cukup pakai "file.jpg"
+    if (pathOrBase64.startsWith("data:image")) {
+      return "image.jpg"; // default nama
+    }
+    // Kalau URL / path, ambil bagian terakhir
+    return pathOrBase64.split("/").pop() || "image.jpg";
+  }
+
   const fetchTasks = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -96,7 +111,65 @@ export default function TasksTable() {
      EDIT TASK
   ======================= */
   const handleEdit = (task: Task) => {
-    alert(`Edit Task: ${task.nameTask}`);
+    setEditingTask(task);
+    setImageFile(null);
+    setIsEditOpen(true);
+  };
+
+  const handleUpdateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingTask) return;
+
+    try {
+      setSaving(true);
+      const token = localStorage.getItem("token");
+
+      const res = await fetch(
+        `http://localhost:3000/api/task/update/${editingTask.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nameTask: editingTask.nameTask,
+            statusTask: editingTask.statusTask.toUpperCase(),
+            startTask: new Date(editingTask.startTask).toISOString(),
+            finishTask: new Date(editingTask.finishTask).toISOString(),
+            image: editingTask.image || "", // base64 atau path baru
+          }),
+        },
+      );
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        console.error(json);
+        alert(json.message || "Gagal update task");
+        return;
+      }
+
+      // === UPDATE STATE TASKS LANGSUNG ===
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === editingTask.id
+            ? { ...task, ...editingTask } // update semua field termasuk image
+            : task,
+        ),
+      );
+
+      setSuccessMessage("Task berhasil diperbarui");
+      setIsEditOpen(false);
+      setEditingTask(null);
+
+      setTimeout(() => setSuccessMessage(""), 3000);
+    } catch (error) {
+      console.error(error);
+      alert("Server error");
+    } finally {
+      setSaving(false);
+    }
   };
 
   /* =======================
@@ -118,6 +191,39 @@ export default function TasksTable() {
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
+      {successMessage && (
+        <div className="fixed top-6 left-1/2 z-[999999] -translate-x-1/2">
+          <div
+            className="
+        flex items-center gap-3
+        rounded-xl border border-green-200
+        bg-green-50 px-6 py-4
+        text-green-700 shadow-lg
+        animate-fade-in
+        dark:border-green-800
+        dark:bg-green-900/40
+        dark:text-green-300
+      "
+          >
+            <svg
+              className="h-6 w-6 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+
+            <span className="text-sm font-semibold">{successMessage}</span>
+          </div>
+        </div>
+      )}
+
       <div className="max-w-full overflow-x-auto">
         <Table>
           {/* ================= HEADER ================= */}
@@ -212,8 +318,8 @@ export default function TasksTable() {
       {/* ================= IMAGE PREVIEW MODAL ================= */}
       {previewImage &&
         createPortal(
-          <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50">
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl p-4 max-w-md w-full relative">
+          <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50 p-4">
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl relative w-full max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl">
               <button
                 onClick={() => setPreviewImage(null)}
                 className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
@@ -224,8 +330,183 @@ export default function TasksTable() {
               <img
                 src={previewImage}
                 alt="Preview"
-                className="w-full h-auto rounded-lg object-contain"
+                className="
+            w-full 
+            h-auto 
+            max-h-[60vh] sm:max-h-[70vh] md:max-h-[80vh] 
+            rounded-lg 
+            object-contain
+          "
               />
+            </div>
+          </div>,
+          document.body,
+        )}
+
+      {/* ================= EDIT TASK MODAL ================= */}
+      {isEditOpen &&
+        editingTask &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onMouseDown={() => setIsEditOpen(false)}
+          >
+            <div
+              className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-gray-800 shadow-lg"
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                Edit Task
+              </h3>
+
+              <form className="space-y-4" onSubmit={handleUpdateTask}>
+                {/* Task Name */}
+                <div>
+                  <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
+                    Task Name
+                  </label>
+                  <input
+                    value={editingTask.nameTask}
+                    onChange={(e) =>
+                      setEditingTask({
+                        ...editingTask,
+                        nameTask: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
+
+                {/* Start Date */}
+                <div>
+                  <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={editingTask.startTask.slice(0, 10)}
+                    onChange={(e) =>
+                      setEditingTask({
+                        ...editingTask,
+                        startTask: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
+
+                {/* Finish Date */}
+                <div>
+                  <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
+                    Finish Date
+                  </label>
+                  <input
+                    type="date"
+                    value={editingTask.finishTask.slice(0, 10)}
+                    onChange={(e) =>
+                      setEditingTask({
+                        ...editingTask,
+                        finishTask: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
+
+                {/* Status */}
+                <div>
+                  <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
+                    Status
+                  </label>
+                  <select
+                    value={editingTask.statusTask}
+                    onChange={(e) =>
+                      setEditingTask({
+                        ...editingTask,
+                        statusTask: e.target.value as StatusTask,
+                      })
+                    }
+                    className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                  >
+                    <option value="PENDING">PENDING</option>
+                    <option value="PROGRESS">PROGRESS</option>
+                    <option value="DONE">DONE</option>
+                  </select>
+                </div>
+
+                {/* Image */}
+                <div>
+                  <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
+                    Image
+                  </label>
+
+                  {/* Kotak custom */}
+                  <div className="mb-2 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                    <span>
+                      {imageFile?.name ||
+                        (editingTask.image
+                          ? getFileName(editingTask.image)
+                          : "No file chosen")}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        document.getElementById("fileInput")?.click()
+                      }
+                      className="rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700"
+                    >
+                      Upload
+                    </button>
+                  </div>
+
+                  {/* Sembunyikan input asli */}
+                  <input
+                    id="fileInput"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+
+                      setImageFile(file);
+
+                      // Buat preview
+
+                      // Update langsung state editingTask.image dengan base64
+                      const reader = new FileReader();
+                      reader.onloadend = () => {
+                        if (editingTask) {
+                          setEditingTask({
+                            ...editingTask,
+                            image: reader.result as string, // ini base64
+                          });
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    className="hidden"
+                  />
+                </div>
+
+                {/* Buttons */}
+                <div className="flex justify-end gap-2 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditOpen(false)}
+                    className="rounded-lg border px-4 py-2 text-sm dark:text-white"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm text-white hover:bg-blue-700 disabled:opacity-60"
+                  >
+                    {saving ? "Saving..." : "Save"}
+                  </button>
+                </div>
+              </form>
             </div>
           </div>,
           document.body,

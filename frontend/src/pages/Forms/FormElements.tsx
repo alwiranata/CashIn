@@ -14,10 +14,7 @@ import PageMeta from "../../components/common/PageMeta";
 export default function FormElements() {
   return (
     <div>
-      <PageMeta
-        title="React.js Form Elements Dashboard | NoteFlow - React.js Admin Dashboard Template"
-        description="This is React.js Form Elements  Dashboard page for NoteFlow - React.js Tailwind CSS Admin Dashboard Template"
-      />
+      <PageMeta title="NoteFlow" />
       <PageBreadcrumb pageTitle="Form Elements" />
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         <div className="space-y-6">

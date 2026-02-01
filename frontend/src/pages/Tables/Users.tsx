@@ -7,7 +7,7 @@ export default function Users() {
   return (
     <>
       <PageMeta
-        title="React.js Basic Tables Dashboard | NoteFlow - Next.js Admin Dashboard Template"
+        title="NoteFlow"
       />
       <PageBreadcrumb pageTitle="Users" />
       <div className="space-y-6">
