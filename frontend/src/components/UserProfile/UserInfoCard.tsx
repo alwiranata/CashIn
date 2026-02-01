@@ -1,6 +1,8 @@
 import { useModal } from "../../hooks/useModal";
 import { jwtDecode } from "jwt-decode";
 import { createPortal } from "react-dom";
+import { useState } from "react";
+
 interface MyJwtPayload {
   id: number;
   name: string;
@@ -12,11 +14,108 @@ interface MyJwtPayload {
 
 export default function UserInfoCard() {
   const { openModal, closeModal, isOpen } = useModal();
+
   const token = localStorage.getItem("token");
   const user = token ? jwtDecode<MyJwtPayload>(token) : null;
 
+  /* ================= FORM STATE ================= */
+  const [name, setName] = useState(user?.name ?? "");
+  const [email, setEmail] = useState(user?.email ?? "");
+  const [loading, setLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+
+  /* ================= SUBMIT HANDLER ================= */
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !token) return;
+
+    try {
+      setLoading(true);
+
+      const res = await fetch(
+        `http://localhost:3000/api/user/update/${user.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name,
+            email,
+          }),
+        },
+      );
+
+      const json = await res.json();
+
+      if (!res.ok) {
+        alert(json.message || "Gagal update profile");
+        return;
+      }
+
+      /**
+       * WAJIB:
+       * backend harus return JWT baru
+       * contoh response: { token: "new_jwt" }
+       */
+      if (json.token) {
+        localStorage.setItem("token", json.token);
+      }
+
+      setSuccessMessage("Profile berhasil diperbarui");
+
+      closeModal();
+
+      // ⏳ kasih waktu alert tampil
+      setTimeout(() => {
+        window.location.reload();
+      }, 3200);
+    } catch (error) {
+      console.error(error);
+      alert("Terjadi kesalahan server");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="p-5 border border-gray-200 rounded-2xl dark:border-gray-800 lg:p-6">
+      {successMessage && (
+        <div className="fixed top-6 left-1/2 z-[999999] -translate-x-1/2">
+          <div
+            className="
+        flex items-center gap-3
+        rounded-xl border border-green-200
+        bg-green-50 px-6 py-4
+        text-green-700 shadow-lg
+        animate-fade-in
+        dark:border-green-800
+        dark:bg-green-900/40
+        dark:text-green-300
+      "
+          >
+            <svg
+              className="h-6 w-6 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M5 13l4 4L19 7"
+              />
+            </svg>
+
+            <span className=" text-center  text-sm font-semibold ">
+              {successMessage}
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h4 className="text-lg font-semibold text-gray-800 dark:text-white/90 lg:mb-6">
@@ -53,6 +152,7 @@ export default function UserInfoCard() {
           </div>
         </div>
 
+        {/* EDIT BUTTON */}
         <button
           onMouseDown={(e) => e.stopPropagation()}
           onClick={openModal}
@@ -69,35 +169,36 @@ export default function UserInfoCard() {
             <path
               fillRule="evenodd"
               clipRule="evenodd"
-              d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206ZM12.9698 3.84272C13.2627 3.54982 13.7376 3.54982 14.0305 3.84272L14.6934 4.50563C14.9863 4.79852 14.9863 5.2734 14.6934 5.56629L14.044 6.21573L12.3204 4.49215L12.9698 3.84272ZM11.2597 5.55281L5.6359 11.1766C5.53309 11.2794 5.46238 11.4099 5.43238 11.5522L5.01758 13.5185L6.98394 13.1037C7.1262 13.0737 7.25666 13.003 7.35947 12.9002L12.9833 7.27639L11.2597 5.55281Z"
-              fill=""
+              d="M15.0911 2.78206C14.2125 1.90338 12.7878 1.90338 11.9092 2.78206L4.57524 10.116C4.26682 10.4244 4.0547 10.8158 3.96468 11.2426L3.31231 14.3352C3.25997 14.5833 3.33653 14.841 3.51583 15.0203C3.69512 15.1996 3.95286 15.2761 4.20096 15.2238L7.29355 14.5714C7.72031 14.4814 8.11172 14.2693 8.42013 13.9609L15.7541 6.62695C16.6327 5.74827 16.6327 4.32365 15.7541 3.44497L15.0911 2.78206Z"
             />
           </svg>
           Edit
         </button>
       </div>
-      {/* EDIT MODAL */}
+
+      {/* ================= MODAL ================= */}
       {isOpen &&
         createPortal(
           <div
             className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50"
-            onMouseDown={closeModal} // ⬅️ PENTING (bukan onClick)
+            onMouseDown={closeModal}
           >
             <div
               className="w-full max-w-md rounded-2xl bg-white p-6 dark:bg-gray-800"
-              onMouseDown={(e) => e.stopPropagation()} // ⛔ STOP TOTAL
+              onMouseDown={(e) => e.stopPropagation()}
             >
               <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
                 Edit Personal Information
               </h3>
 
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleSubmit}>
                 <div>
                   <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
                     Name
                   </label>
                   <input
-                    defaultValue={user?.name}
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
                     className="w-full rounded-lg border px-3 py-2 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
@@ -107,7 +208,8 @@ export default function UserInfoCard() {
                     Email
                   </label>
                   <input
-                    defaultValue={user?.email}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full rounded-lg border px-3 py-2 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
@@ -123,9 +225,10 @@ export default function UserInfoCard() {
 
                   <button
                     type="submit"
-                    className="rounded-lg bg-blue-600  dark:bg-white px-4 py-2 text-sm text-white dark:text-black"
+                    disabled={loading}
+                    className="rounded-lg bg-blue-600 dark:bg-white px-4 py-2 text-sm text-white dark:text-black"
                   >
-                    Save
+                    {loading ? "Saving..." : "Save"}
                   </button>
                 </div>
               </form>
