@@ -5,10 +5,7 @@ import SignUpForm from "../../components/auth/SignUpForm";
 export default function SignUp() {
   return (
     <>
-      <PageMeta
-        title="React.js SignUp Dashboard | NoteFlow - Next.js Admin Dashboard Template"
-        description="This is React.js SignUp Tables Dashboard page for NoteFlow - React.js Tailwind CSS Admin Dashboard Template"
-      />
+      <PageMeta title="SignUp" />
       <AuthLayout>
         <SignUpForm />
       </AuthLayout>

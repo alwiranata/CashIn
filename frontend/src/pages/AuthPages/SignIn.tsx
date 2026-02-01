@@ -5,10 +5,7 @@ import SignInForm from "../../components/auth/SignInForm";
 export default function SignIn() {
   return (
     <>
-      <PageMeta
-        title="React.js SignIn Dashboard | NoteFlow - Next.js Admin Dashboard Template"
-        description="This is React.js SignIn Tables Dashboard page for NoteFlow - React.js Tailwind CSS Admin Dashboard Template"
-      />
+      <PageMeta title="SignIn" />
       <AuthLayout>
         <SignInForm />
       </AuthLayout>
