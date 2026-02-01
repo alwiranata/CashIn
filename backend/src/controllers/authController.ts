@@ -176,6 +176,7 @@ export const login: RequestHandler = async (req, res) => {
     const token = jwt.sign(
       {
         id: user.id,
+        name: user.name, // ✅ TAMBAH INI
         email: user.email,
         role: user.role,
       },
