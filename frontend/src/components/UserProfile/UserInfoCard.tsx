@@ -226,7 +226,7 @@ export default function UserInfoCard() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="rounded-lg bg-blue-600 dark:bg-white px-4 py-2 text-sm text-white dark:text-black"
+                    className="rounded-lg bg-blue-600  px-4 py-2 text-sm text-white"
                   >
                     {loading ? "Saving..." : "Save"}
                   </button>

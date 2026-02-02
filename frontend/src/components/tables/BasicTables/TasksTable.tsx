@@ -108,9 +108,13 @@ export default function TasksTable() {
           },
         },
       );
-      if (!res.ok) throw new Error("Gagal hapus task");
+      if (!res.ok) throw new Error("Failed to delete task");
 
-      setSuccessMessage("Task berhasil dihapus");
+      setSuccessMessage("Task deleted successfully");
+      
+      setTimeout(() => {
+        setSuccessMessage("");
+      }, 3000);
       fetchTasks();
     } catch (error) {
       console.error(error);
@@ -173,7 +177,7 @@ export default function TasksTable() {
         ),
       );
 
-      setSuccessMessage("Task berhasil diperbarui");
+      setSuccessMessage("Task successfully updated");
       setIsEditOpen(false);
       setEditingTask(null);
 
