@@ -47,6 +47,8 @@ export default function TasksTable() {
   const [successMessage, setSuccessMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [deleteTaskId, setDeleteTaskId] = useState<number | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   /* =======================
      FETCH TASK
@@ -92,18 +94,30 @@ export default function TasksTable() {
   /* =======================
      DELETE TASK
   ======================= */
-  const handleDelete = async (id: number) => {
-    if (!confirm("Yakin mau hapus task ini?")) return;
-
+  const handleConfirmDelete = async () => {
+    if (deleteTaskId === null) return;
     try {
-      await fetch(`http://localhost:3000/api/task/delete/${id}`, {
-        method: "DELETE",
-      });
+      setDeleting(true);
+      const token = localStorage.getItem("token");
+      const res = await fetch(
+        `http://localhost:3000/api/task/delete/${deleteTaskId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+      if (!res.ok) throw new Error("Gagal hapus task");
 
+      setSuccessMessage("Task berhasil dihapus");
       fetchTasks();
     } catch (error) {
       console.error(error);
       alert("Gagal hapus task");
+    } finally {
+      setDeleting(false);
+      setDeleteTaskId(null);
     }
   };
 
@@ -294,7 +308,7 @@ export default function TasksTable() {
                     </button>
 
                     <button
-                      onClick={() => handleDelete(task.id)}
+                      onClick={() => setDeleteTaskId(task.id)}
                       className="px-3 py-1 text-sm rounded bg-red-500 text-white hover:bg-red-600"
                     >
                       <i className="bi bi-trash3"></i>
@@ -314,6 +328,44 @@ export default function TasksTable() {
           </TableBody>
         </Table>
       </div>
+      {/* ================= DELETE TASK MODAL ================= */}
+      {deleteTaskId !== null &&
+        createPortal(
+          <div
+            className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50"
+            onClick={() => setDeleteTaskId(null)}
+          >
+            <div
+              className="w-full max-w-sm rounded-2xl bg-white p-6 dark:bg-gray-800 shadow-lg"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
+                Delete Confirmation
+              </h3>
+              <p className="mb-6 text-gray-600 dark:text-gray-300">
+                Are you sure you want to delete this task?
+              </p>
+              <div className="flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setDeleteTaskId(null)}
+                  className="rounded-lg border px-4 py-2 text-sm dark:text-white"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={handleConfirmDelete}
+                  disabled={deleting}
+                  className="rounded-lg bg-red-600 px-4 py-2 text-sm text-white hover:bg-red-700 disabled:opacity-60"
+                >
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
 
       {/* ================= IMAGE PREVIEW MODAL ================= */}
       {previewImage &&
