@@ -75,9 +75,9 @@ export default function AddTask({ onSuccess }: { onSuccess?: () => void }) {
       {/* BUTTON */}
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 rounded-lg bg-blue-500 px-4 py-2 text-white hover:bg-blue-700"
+        className="flex items-end  gap-2 rounded-lg bg-sky-600 px-4 py-2 text-white hover:bg-blue-700"
       >
-        <i className="bi bi-plus-lg" />
+<i className="bi bi-vector-pen"></i>
       </button>
 
       {/* MODAL */}
