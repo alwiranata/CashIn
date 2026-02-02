@@ -37,8 +37,11 @@ interface ApiResponse {
 /* =======================
    COMPONENT
 ======================= */
+type TasksTableProps = {
+  reloadKey: number;
+};
 
-export default function TasksTable() {
+export default function TasksTable({ reloadKey }: TasksTableProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -89,7 +92,7 @@ export default function TasksTable() {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
+  }, [reloadKey]);
 
   /* =======================
      DELETE TASK
@@ -111,7 +114,7 @@ export default function TasksTable() {
       if (!res.ok) throw new Error("Failed to delete task");
 
       setSuccessMessage("Task deleted successfully");
-      
+
       setTimeout(() => {
         setSuccessMessage("");
       }, 3000);
@@ -296,7 +299,7 @@ export default function TasksTable() {
                 <TableCell className="px-4 py-3 text-start">
                   <button
                     onClick={() => setPreviewImage(task.image ?? null)}
-                    className="px-3 py-1 text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
+                    className="px-3 py-1  text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
                   >
                     <i className="bi bi-eye"></i>
                   </button>
@@ -387,9 +390,10 @@ export default function TasksTable() {
                 src={previewImage}
                 alt="Preview"
                 className="
+                p-5
             w-full 
             h-auto 
-            max-h-[60vh] sm:max-h-[70vh] md:max-h-[80vh] 
+            max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] 
             rounded-lg 
             object-contain
           "
@@ -498,7 +502,7 @@ export default function TasksTable() {
 
                   {/* Kotak custom */}
                   <div className="mb-2 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                    <span>
+                    <span className="flex-1 truncate">
                       {imageFile?.name ||
                         (editingTask.image
                           ? getFileName(editingTask.image)
