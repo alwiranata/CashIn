@@ -52,6 +52,15 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [deleteTaskId, setDeleteTaskId] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const ITEMS_PER_PAGE = 10;
+  const totalPages = Math.ceil(tasks.length / ITEMS_PER_PAGE);
+
+  const paginatedTasks = tasks.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE,
+  );
 
   /* =======================
      FETCH TASK
@@ -183,6 +192,7 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
       setSuccessMessage("Task successfully updated");
       setIsEditOpen(false);
       setEditingTask(null);
+      setCurrentPage(1);
 
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
@@ -209,6 +219,37 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
       </div>
     );
   }
+
+  const getPaginationPages = () => {
+    const pages: (number | string)[] = [];
+
+    if (totalPages <= 3) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+
+    // awal
+    if (currentPage <= 2) {
+      pages.push(1, 2, 3, "...", totalPages);
+      return pages;
+    }
+
+    // akhir
+    if (currentPage >= totalPages - 1) {
+      pages.push("...", totalPages - 2, totalPages - 1, totalPages);
+      return pages;
+    }
+
+    // tengah
+    pages.push(
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+      "...",
+      totalPages,
+    );
+
+    return pages;
+  };
 
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white dark:border-white/[0.05] dark:bg-white/[0.03]">
@@ -272,10 +313,10 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
 
           {/* ================= BODY ================= */}
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {tasks.map((task, index) => (
+            {paginatedTasks.map((task, index) => (
               <TableRow key={task.id}>
                 <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
-                  {index + 1}
+                  {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
@@ -335,6 +376,52 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
           </TableBody>
         </Table>
       </div>
+      {/* ================= PAGINATION ================= */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center sm:justify-end gap-2 p-4 border-t dark:border-white/[0.05]">
+          <div className="flex items-center gap-2">
+            {/* PREV */}
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+              className="rounded border px-3 py-1 text-sm disabled:opacity-50 dark:text-white"
+            >
+              Prev
+            </button>
+
+            {/* PAGE NUMBERS */}
+            {getPaginationPages().map((page, i) =>
+              page === "..." ? (
+                <span key={i} className="px-2 text-gray-400">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(page as number)}
+                  className={`rounded px-3 py-1 text-sm ${
+                    currentPage === page
+                      ? "bg-blue-600 text-white"
+                      : "border hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white"
+                  }`}
+                >
+                  {page}
+                </button>
+              ),
+            )}
+
+            {/* NEXT */}
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+              className="rounded border px-3 py-1 text-sm disabled:opacity-50 dark:text-white"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* ================= DELETE TASK MODAL ================= */}
       {deleteTaskId !== null &&
         createPortal(

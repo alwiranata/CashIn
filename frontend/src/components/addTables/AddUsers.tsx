@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 
 type StatusTask = "PENDING" | "PROGRESS" | "DONE";
 
-export default function AddTask({ onSuccess }: { onSuccess?: () => void }) {
+export default function AddUser({ onSuccess }: { onSuccess?: () => void }) {
   const [open, setOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -14,7 +14,6 @@ export default function AddTask({ onSuccess }: { onSuccess?: () => void }) {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageBase64, setImageBase64] = useState<string>("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   function getFileName(pathOrBase64: string) {
     if (!pathOrBase64) return "No file chosen";
@@ -53,11 +52,7 @@ export default function AddTask({ onSuccess }: { onSuccess?: () => void }) {
       });
 
       if (!res.ok) throw new Error("Failed to create task");
-      setSuccessMessage("Task added successfully");
 
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
       setOpen(false);
       setNameTask("");
       setStatusTask("PENDING");
@@ -77,40 +72,6 @@ export default function AddTask({ onSuccess }: { onSuccess?: () => void }) {
 
   return (
     <>
-      {/* alert success */}
-      {successMessage && (
-        <div className="fixed top-6 left-1/2 z-[999999] -translate-x-1/2">
-          <div
-            className="
-        flex items-center gap-3
-        rounded-xl border border-green-200
-        bg-green-50 px-6 py-4
-        text-green-700 shadow-lg
-        animate-fade-in
-        dark:border-green-800
-        dark:bg-green-900/40
-        dark:text-green-300
-      "
-          >
-            <svg
-              className="h-6 w-6 flex-shrink-0"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
-
-            <span className="text-sm font-semibold">{successMessage}</span>
-          </div>
-        </div>
-      )}
-
       {/* BUTTON */}
       <button
         onClick={() => setOpen(true)}
