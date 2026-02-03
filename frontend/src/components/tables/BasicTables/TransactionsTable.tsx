@@ -293,10 +293,10 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
             <TableRow>
               {[
                 "No",
-                "Task Name",
-                "Start",
-                "Finish",
-                "Status",
+                "Name",
+                "Price",
+                "Date",
+                "Type",
                 "Image",
                 "Action",
               ].map((title) => (
@@ -378,45 +378,47 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
       </div>
       {/* ================= PAGINATION ================= */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-end gap-2 p-4">
-          {/* PREV */}
-          <button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-            className="rounded border px-3 py-1 text-sm disabled:opacity-50"
-          >
-            Prev
-          </button>
+        <div className="flex flex-col sm:flex-row items-center sm:justify-end gap-2 p-4 border-t dark:border-white/[0.05]">
+          <div className="flex items-center gap-2">
+            {/* PREV */}
+            <button
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
+              className="rounded border px-3 py-1 text-sm disabled:opacity-50 dark:text-white"
+            >
+              Prev
+            </button>
 
-          {/* PAGE NUMBERS (MAX 3 + ...) */}
-          {getPaginationPages().map((page, i) =>
-            page === "..." ? (
-              <span key={i} className="px-2 text-gray-400">
-                ...
-              </span>
-            ) : (
-              <button
-                key={i}
-                onClick={() => setCurrentPage(page as number)}
-                className={`rounded px-3 py-1 text-sm ${
-                  currentPage === page
-                    ? "bg-blue-600 text-white"
-                    : "border hover:bg-gray-100 dark:hover:bg-gray-700"
-                }`}
-              >
-                {page}
-              </button>
-            ),
-          )}
+            {/* PAGE NUMBERS */}
+            {getPaginationPages().map((page, i) =>
+              page === "..." ? (
+                <span key={i} className="px-2 text-gray-400">
+                  ...
+                </span>
+              ) : (
+                <button
+                  key={i}
+                  onClick={() => setCurrentPage(page as number)}
+                  className={`rounded px-3 py-1 text-sm ${
+                    currentPage === page
+                      ? "bg-blue-600 text-white"
+                      : "border hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-white"
+                  }`}
+                >
+                  {page}
+                </button>
+              ),
+            )}
 
-          {/* NEXT */}
-          <button
-            disabled={currentPage === totalPages}
-            onClick={() => setCurrentPage((p) => p + 1)}
-            className="rounded border px-3 py-1 text-sm disabled:opacity-50"
-          >
-            Next
-          </button>
+            {/* NEXT */}
+            <button
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
+              className="rounded border px-3 py-1 text-sm disabled:opacity-50 dark:text-white"
+            >
+              Next
+            </button>
+          </div>
         </div>
       )}
 

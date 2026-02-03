@@ -293,7 +293,7 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
             <TableRow>
               {[
                 "No",
-                "Task Name",
+                "Name",
                 "Start",
                 "Finish",
                 "Status",
