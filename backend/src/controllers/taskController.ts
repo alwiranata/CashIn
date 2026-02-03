@@ -52,7 +52,16 @@ export const getTaskById: RequestHandler = async (req, res) => {
 
 export const getAllTask: RequestHandler = async (req, res) => {
   try {
-    const tasks = await prisma.task.findMany();
+    const userReq = req as userRequest;
+
+    const tasks = await prisma.task.findMany({
+      where: {
+        createdById: userReq.user.id, // 🔥 hanya milik user
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
     return res.status(200).json({
       message: "Get all task successfully",
@@ -68,6 +77,7 @@ export const getAllTask: RequestHandler = async (req, res) => {
         })),
       });
     }
+
     return res.status(500).json({
       message: "Internal server error",
     });
