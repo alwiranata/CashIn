@@ -14,7 +14,7 @@ export default function User() {
       <PageBreadcrumb pageTitle="Users" />
 
       <div className="space-y-6">
-        <ComponentCard title="Users">
+        <ComponentCard title="User">
           <div className="flex justify-end mb-4">
             <AddUser onSuccess={() => setReloadKey((k) => k + 1)} />
           </div>
