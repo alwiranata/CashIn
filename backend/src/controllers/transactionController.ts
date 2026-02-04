@@ -10,10 +10,19 @@ import { userRequest } from "../types/userRequest";
 
 export const getAllTransaction: RequestHandler = async (req, res) => {
   try {
-    const transaction = await prisma.transaction.findMany();
+    const userReq = req as userRequest;
+
+    const transaction = await prisma.transaction.findMany({
+      where: {
+        createdById: userReq.user.id,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
 
     return res.status(200).json({
-      message: "Get all data sucessfully",
+      message: "Get all data successfully",
       data: transaction,
     });
   } catch (error) {
@@ -26,7 +35,6 @@ export const getAllTransaction: RequestHandler = async (req, res) => {
         })),
       });
     }
-
     return res.status(500).json({
       message: "Internal server error",
     });
@@ -127,15 +135,15 @@ export const updateTransaction: RequestHandler = async (req, res) => {
         message: "Transaction ID is required",
       });
     }
-    
+
     const idNumber = Number(id);
-    
+
     const findTransaction = await prisma.transaction.findUnique({
       where: {
         id: idNumber,
       },
     });
-    
+
     if (!findTransaction) {
       return res.status(404).json({
         message: "Transaction not found",
@@ -143,7 +151,7 @@ export const updateTransaction: RequestHandler = async (req, res) => {
     }
 
     const validated = updateTransactionValidation.parse(req.body);
-    
+
     const data = removeUndefined(validated);
 
     const updateTransaction = await prisma.transaction.update({
