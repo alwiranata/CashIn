@@ -15,15 +15,15 @@ import Badge from "../../ui/badge/Badge";
    TYPES
 ======================= */
 
-type StatusTask = "PENDING" | "PROGRESS" | "DONE";
+type TypeTransaction = "INCOME" | "EXPENSE";
 
-interface Task {
+interface Transaction {
   id: number;
-  nameTask: string;
-  image: string | null;
-  startTask: string;
-  finishTask: string;
-  statusTask: StatusTask;
+  nameTransaction: string; //
+  price: number | string;
+  image: string | null; //
+  typeTransaction: TypeTransaction; //
+  transactionDate: string;
   createdById: number;
   createdAt: string;
   updateAt: string;
@@ -31,88 +31,89 @@ interface Task {
 
 interface ApiResponse {
   message: string;
-  data: Task[];
+  data: Transaction[];
 }
 
 /* =======================
    COMPONENT
 ======================= */
-type TasksTableProps = {
+
+type TransactionTableProps = {
   reloadKey: number;
 };
 
-export default function TasksTable({ reloadKey }: TasksTableProps) {
-  const [tasks, setTasks] = useState<Task[]>([]);
+export default function TransactionTable({ reloadKey }: TransactionTableProps) {
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingTransaction, setEditingTransaction] =
+    useState<Transaction | null>(null);
   const [successMessage, setSuccessMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [deleteTaskId, setDeleteTaskId] = useState<number | null>(null);
+  const [deleteTransactionId, setDeleteTransactionId] = useState<number | null>(
+    null,
+  );
   const [deleting, setDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = 10;
-  const totalPages = Math.ceil(tasks.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(transactions.length / ITEMS_PER_PAGE);
 
-  const paginatedTasks = tasks.slice(
+  const paginatedTransactions = transactions.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
 
   /* =======================
-     FETCH TASK
+     UTIL
   ======================= */
-  // Ambil nama file dari path / base64
   function getFileName(pathOrBase64: string) {
-    // Kalau base64, cukup pakai "file.jpg"
-    if (pathOrBase64.startsWith("data:image")) {
-      return "image.jpg"; // default nama
-    }
-    // Kalau URL / path, ambil bagian terakhir
+    if (pathOrBase64.startsWith("data:image")) return "image.jpg";
     return pathOrBase64.split("/").pop() || "image.jpg";
   }
 
-  const fetchTasks = async () => {
+  /* =======================
+     FETCH TRANSACTION
+  ======================= */
+  const fetchTransactions = async () => {
     try {
       const token = localStorage.getItem("token");
-
-      const res = await fetch("http://localhost:3000/api/task/getAll", {
+      const res = await fetch("http://localhost:3000/api/transaction/getAll", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!res.ok) {
-        throw new Error("Unauthorized / Failed Fetch");
-      }
+      if (!res.ok) throw new Error("Failed fetch");
 
       const json: ApiResponse = await res.json();
-      setTasks(json.data || []);
+      setTransactions(json.data || []);
     } catch (error) {
-      console.error("Failed fetch task:", error);
-      alert("Gagal mengambil data task (Unauthorized)");
+      console.error(error);
+      alert("Gagal mengambil data transaction");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTasks();
+    fetchTransactions();
   }, [reloadKey]);
 
   /* =======================
-     DELETE TASK
+     DELETE TRANSACTION
   ======================= */
   const handleConfirmDelete = async () => {
-    if (deleteTaskId === null) return;
+    if (!deleteTransactionId) return;
+
     try {
       setDeleting(true);
       const token = localStorage.getItem("token");
+
       const res = await fetch(
-        `http://localhost:3000/api/task/delete/${deleteTaskId}`,
+        `http://localhost:3000/api/transaction/delete/${deleteTransactionId}`,
         {
           method: "DELETE",
           headers: {
@@ -120,42 +121,41 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
           },
         },
       );
-      if (!res.ok) throw new Error("Failed to delete task");
 
-      setSuccessMessage("Task deleted successfully");
+      if (!res.ok) throw new Error("Delete failed");
 
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
-      fetchTasks();
+      setSuccessMessage("Transaction deleted successfully");
+      fetchTransactions();
+
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error(error);
-      alert("Gagal hapus task");
+      alert("Gagal hapus transaction");
     } finally {
       setDeleting(false);
-      setDeleteTaskId(null);
+      setDeleteTransactionId(null);
     }
   };
 
   /* =======================
-     EDIT TASK
+     EDIT TRANSACTION
   ======================= */
-  const handleEdit = (task: Task) => {
-    setEditingTask(task);
+  const handleEdit = (trx: Transaction) => {
+    setEditingTransaction(trx);
     setImageFile(null);
     setIsEditOpen(true);
   };
 
-  const handleUpdateTask = async (e: React.FormEvent) => {
+  const handleUpdateTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingTask) return;
+    if (!editingTransaction) return;
 
     try {
       setSaving(true);
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://localhost:3000/api/task/update/${editingTask.id}`,
+        `http://localhost:3000/api/transaction/update/${editingTransaction.id}`,
         {
           method: "PATCH",
           headers: {
@@ -163,92 +163,57 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            nameTask: editingTask.nameTask,
-            statusTask: editingTask.statusTask.toUpperCase(),
-            startTask: new Date(editingTask.startTask).toISOString(),
-            finishTask: new Date(editingTask.finishTask).toISOString(),
-            image: editingTask.image || "", // base64 atau path baru
+            nameTransaction: editingTransaction.nameTransaction,
+            price: editingTransaction.price,
+            typeTransaction: editingTransaction.typeTransaction,
+            transactionDate: editingTransaction.transactionDate,
+            image: editingTransaction.image,
           }),
         },
       );
 
-      const json = await res.json();
+      if (!res.ok) throw new Error("Update failed");
 
-      if (!res.ok) {
-        console.error(json);
-        alert(json.message || "Gagal update task");
-        return;
-      }
-
-      // === UPDATE STATE TASKS LANGSUNG ===
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === editingTask.id
-            ? { ...task, ...editingTask } // update semua field termasuk image
-            : task,
-        ),
-      );
-
-      setSuccessMessage("Task successfully updated");
+      setSuccessMessage("Transaction updated successfully");
       setIsEditOpen(false);
-      setEditingTask(null);
-      setCurrentPage(1);
+      setEditingTransaction(null);
+      fetchTransactions();
 
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error(error);
-      alert("Server error");
+      alert("Gagal update transaction");
     } finally {
       setSaving(false);
     }
   };
 
   /* =======================
-     STATUS COLOR
+     TYPE COLOR
   ======================= */
-  const renderStatusColor = (status: StatusTask) => {
-    if (status === "DONE") return "success";
-    if (status === "PROGRESS") return "warning";
-    return "error";
-  };
+  const renderTypeColor = (type: TypeTransaction) =>
+    type === "INCOME" ? "success" : "error";
 
   if (loading) {
     return (
       <div className="p-5 text-gray-500 dark:text-gray-400">
-        Loading tasks...
+        Loading transactions...
       </div>
     );
   }
 
+  /* =======================
+     PAGINATION LOGIC
+  ======================= */
   const getPaginationPages = () => {
-    const pages: (number | string)[] = [];
-
-    if (totalPages <= 3) {
+    if (totalPages <= 3)
       return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
 
-    // awal
-    if (currentPage <= 2) {
-      pages.push(1, 2, 3, "...", totalPages);
-      return pages;
-    }
+    if (currentPage <= 2) return [1, 2, 3, "...", totalPages];
+    if (currentPage >= totalPages - 1)
+      return ["...", totalPages - 2, totalPages - 1, totalPages];
 
-    // akhir
-    if (currentPage >= totalPages - 1) {
-      pages.push("...", totalPages - 2, totalPages - 1, totalPages);
-      return pages;
-    }
-
-    // tengah
-    pages.push(
-      currentPage - 1,
-      currentPage,
-      currentPage + 1,
-      "...",
-      totalPages,
-    );
-
-    return pages;
+    return [currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
   };
 
   return (
@@ -291,55 +256,39 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
           {/* ================= HEADER ================= */}
           <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
             <TableRow>
-              {[
-                "No",
-                "Name",
-                "Price",
-                "Date",
-                "Type",
-                "Image",
-                "Action",
-              ].map((title) => (
-                <TableCell
-                  key={title}
-                  isHeader
-                  className="px-5 py-3 text-start text-gray-500 text-theme-xs font-medium dark:text-gray-400"
-                >
-                  {title}
-                </TableCell>
-              ))}
+              {["No", "Name", "Price", "Image", "Type", "Date", "Action"].map(
+                (title) => (
+                  <TableCell
+                    key={title}
+                    isHeader
+                    className="px-5 py-3 text-start text-gray-500 text-theme-xs font-medium dark:text-gray-400"
+                  >
+                    {title}
+                  </TableCell>
+                ),
+              )}
             </TableRow>
           </TableHeader>
 
           {/* ================= BODY ================= */}
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {paginatedTasks.map((task, index) => (
-              <TableRow key={task.id}>
+            {paginatedTransactions.map((trx, index) => (
+              <TableRow key={trx.id}>
                 <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
                   {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
-                  {task.nameTask}
+                  {trx.nameTransaction}
                 </TableCell>
 
-                <TableCell className="px-4 py-3 text-start text-gray-500 dark:text-gray-200">
-                  {new Date(task.startTask).toLocaleDateString()}
+                <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
+                  {trx.price}
                 </TableCell>
 
-                <TableCell className="px-4 py-3 text-start text-gray-500 dark:text-gray-200">
-                  {new Date(task.finishTask).toLocaleDateString()}
-                </TableCell>
-
-                <TableCell className="px-4 py-3 text-start">
-                  <Badge size="sm" color={renderStatusColor(task.statusTask)}>
-                    {task.statusTask}
-                  </Badge>
-                </TableCell>
-
-                <TableCell className="px-4 py-3 text-start">
+                <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
                   <button
-                    onClick={() => setPreviewImage(task.image ?? null)}
+                    onClick={() => setPreviewImage(trx.image ?? null)}
                     className="px-3 py-1  text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
                   >
                     <i className="bi bi-eye"></i>
@@ -347,16 +296,26 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start">
+                  <Badge size="sm" color={renderTypeColor(trx.typeTransaction)}>
+                    {trx.typeTransaction}
+                  </Badge>
+                </TableCell>
+
+                <TableCell className="px-4 py-3 text-start dark:text-gray-200">
+                  {new Date(trx.transactionDate).toLocaleDateString()}
+                </TableCell>
+
+                <TableCell className="px-4 py-3 text-start">
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleEdit(task)}
+                      onClick={() => handleEdit(trx)}
                       className="px-3 py-1 text-sm rounded bg-blue-500 text-white hover:bg-blue-600"
                     >
                       <i className="bi bi-pencil-square"></i>
                     </button>
 
                     <button
-                      onClick={() => setDeleteTaskId(task.id)}
+                      onClick={() => setDeleteTransactionId(trx.id)}
                       className="px-3 py-1 text-sm rounded bg-red-500 text-white hover:bg-red-600"
                     >
                       <i className="bi bi-trash3"></i>
@@ -366,10 +325,10 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
               </TableRow>
             ))}
 
-            {tasks.length === 0 && (
+            {transactions.length === 0 && (
               <TableRow>
                 <TableCell className="text-center py-6 text-gray-400 dark:text-gray-500">
-                  No tasks found
+                  No transaction found
                 </TableCell>
               </TableRow>
             )}
@@ -422,12 +381,12 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
         </div>
       )}
 
-      {/* ================= DELETE TASK MODAL ================= */}
-      {deleteTaskId !== null &&
+      {/* ================= DELETE TRANSACTION MODAL ================= */}
+      {deleteTransactionId !== null &&
         createPortal(
           <div
             className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50"
-            onClick={() => setDeleteTaskId(null)}
+            onClick={() => setDeleteTransactionId(null)}
           >
             <div
               className="w-full max-w-sm rounded-2xl bg-white p-6 dark:bg-gray-800 shadow-lg"
@@ -437,12 +396,12 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
                 Delete Confirmation
               </h3>
               <p className="mb-6 text-gray-600 dark:text-gray-300">
-                Are you sure you want to delete this task?
+                Are you sure you want to delete this transaction?
               </p>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setDeleteTaskId(null)}
+                  onClick={() => setDeleteTransactionId(null)}
                   className="rounded-lg border px-4 py-2 text-sm dark:text-white"
                 >
                   Cancel
@@ -490,9 +449,9 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
           document.body,
         )}
 
-      {/* ================= EDIT TASK MODAL ================= */}
+      {/* ================= EDIT TRANSACTION MODAL ================= */}
       {isEditOpen &&
-        editingTask &&
+        editingTransaction &&
         createPortal(
           <div
             className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
@@ -503,82 +462,42 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
               onMouseDown={(e) => e.stopPropagation()}
             >
               <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
-                Edit Task
+                Edit Transaction
               </h3>
 
-              <form className="space-y-4" onSubmit={handleUpdateTask}>
-                {/* Task Name */}
+              <form className="space-y-4" onSubmit={handleUpdateTransaction}>
+                {/* Transaction Name */}
                 <div>
                   <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
-                    Task Name
+                    Transaction Name
                   </label>
                   <input
-                    value={editingTask.nameTask}
+                    value={editingTransaction.nameTransaction}
                     onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        nameTask: e.target.value,
+                      setEditingTransaction({
+                        ...editingTransaction,
+                        nameTransaction: e.target.value,
                       })
                     }
                     className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
 
-                {/* Start Date */}
+                {/* Price */}
                 <div>
                   <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
-                    Start Date
+                    Price
                   </label>
                   <input
-                    type="date"
-                    value={editingTask.startTask.slice(0, 10)}
+                    value={editingTransaction.price}
                     onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        startTask: e.target.value,
+                      setEditingTransaction({
+                        ...editingTransaction,
+                        price: e.target.value,
                       })
                     }
                     className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                   />
-                </div>
-
-                {/* Finish Date */}
-                <div>
-                  <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
-                    Finish Date
-                  </label>
-                  <input
-                    type="date"
-                    value={editingTask.finishTask.slice(0, 10)}
-                    onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        finishTask: e.target.value,
-                      })
-                    }
-                    className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                  />
-                </div>
-
-                {/* Status */}
-                <div>
-                  <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
-                    Status
-                  </label>
-                  <select
-                    value={editingTask.statusTask}
-                    onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        statusTask: e.target.value as StatusTask,
-                      })
-                    }
-                    className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                  >
-                    <option value="PENDING">PENDING</option>
-                    <option value="PROGRESS">PROGRESS</option>
-                    <option value="DONE">DONE</option>
-                  </select>
                 </div>
 
                 {/* Image */}
@@ -591,8 +510,8 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
                   <div className="mb-2 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
                     <span className="flex-1 truncate">
                       {imageFile?.name ||
-                        (editingTask.image
-                          ? getFileName(editingTask.image)
+                        (editingTransaction.image
+                          ? getFileName(editingTransaction.image)
                           : "No file chosen")}
                     </span>
                     <button
@@ -619,12 +538,12 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
 
                       // Buat preview
 
-                      // Update langsung state editingTask.image dengan base64
+                      // Update langsung state editingtransaction.image dengan base64
                       const reader = new FileReader();
                       reader.onloadend = () => {
-                        if (editingTask) {
-                          setEditingTask({
-                            ...editingTask,
+                        if (editingTransaction) {
+                          setEditingTransaction({
+                            ...editingTransaction,
                             image: reader.result as string, // ini base64
                           });
                         }
@@ -635,6 +554,43 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
                   />
                 </div>
 
+                {/* Type */}
+                <div>
+                  <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
+                    Type
+                  </label>
+                  <select
+                    value={editingTransaction.typeTransaction}
+                    onChange={(e) =>
+                      setEditingTransaction({
+                        ...editingTransaction,
+                        typeTransaction: e.target.value as TypeTransaction,
+                      })
+                    }
+                    className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                  >
+                    <option value="INCOME">INCOME</option>
+                    <option value="EXPENSE">EXPENSE</option>
+                  </select>
+                </div>
+
+                {/* Transaction Date */}
+                <div>
+                  <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
+                    Transaction Date
+                  </label>
+                  <input
+                    type="date"
+                    value={editingTransaction.transactionDate.slice(0, 10)}
+                    onChange={(e) =>
+                      setEditingTransaction({
+                        ...editingTransaction,
+                        transactionDate: e.target.value,
+                      })
+                    }
+                    className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                  />
+                </div>
                 {/* Buttons */}
                 <div className="flex justify-end gap-2 pt-4">
                   <button
