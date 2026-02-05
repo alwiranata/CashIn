@@ -10,7 +10,7 @@ export default function Tasks() {
 
   return (
     <>
-      <PageMeta title="Task" />
+      <PageMeta title="NoteFlow" />
       <PageBreadcrumb pageTitle="Tasks" />
 
       <div className="space-y-6">

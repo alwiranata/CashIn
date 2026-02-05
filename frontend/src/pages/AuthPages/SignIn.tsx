@@ -5,7 +5,7 @@ import SignInForm from "../../components/auth/SignInForm";
 export default function SignIn() {
   return (
     <>
-      <PageMeta title="SignIn" />
+      <PageMeta title="NoteFlow" />
       <AuthLayout>
         <SignInForm />
       </AuthLayout>

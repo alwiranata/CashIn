@@ -10,7 +10,7 @@ export default function Transaction() {
 
   return (
     <>
-      <PageMeta title="Transaction" />
+      <PageMeta title="NoteFlow" />
       <PageBreadcrumb pageTitle="Transactions" />
 
       <div className="space-y-6">

@@ -5,7 +5,7 @@ import SignUpForm from "../../components/auth/SignUpForm";
 export default function SignUp() {
   return (
     <>
-      <PageMeta title="SignUp" />
+      <PageMeta title="NoteFlow" />
       <AuthLayout>
         <SignUpForm />
       </AuthLayout>

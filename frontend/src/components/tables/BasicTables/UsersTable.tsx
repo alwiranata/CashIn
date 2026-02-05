@@ -15,104 +15,92 @@ import Badge from "../../ui/badge/Badge";
    TYPES
 ======================= */
 
-type StatusTask = "PENDING" | "PROGRESS" | "DONE";
+type UserRole = "USER" | "ADMIN";
+type UserStatus = "ACTIVE" | "NONACTIVE";
 
-interface Task {
+interface User {
   id: number;
-  nameTask: string;
-  image: string | null;
-  startTask: string;
-  finishTask: string;
-  statusTask: StatusTask;
-  createdById: number;
+  name: string;
+  email: string;
+  role: UserRole;
+  status: UserStatus;
   createdAt: string;
-  updateAt: string;
 }
 
 interface ApiResponse {
   message: string;
-  data: Task[];
+  data: User[];
 }
 
 /* =======================
    COMPONENT
 ======================= */
-type TasksTableProps = {
+
+type UserTableProps = {
   reloadKey: number;
 };
 
-export default function TasksTable({ reloadKey }: TasksTableProps) {
-  const [tasks, setTasks] = useState<Task[]>([]);
+export default function UserTable({ reloadKey }: UserTableProps) {
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+
   const [successMessage, setSuccessMessage] = useState("");
   const [saving, setSaving] = useState(false);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [deleteTaskId, setDeleteTaskId] = useState<number | null>(null);
+  const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
+
   const [deleting, setDeleting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
 
   const ITEMS_PER_PAGE = 10;
-  const totalPages = Math.ceil(tasks.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(users.length / ITEMS_PER_PAGE);
 
-  const paginatedTasks = tasks.slice(
+  const paginatedUsers = users.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
 
   /* =======================
-     FETCH TASK
+     FETCH USER
   ======================= */
-  // Ambil nama file dari path / base64
-  function getFileName(pathOrBase64: string) {
-    // Kalau base64, cukup pakai "file.jpg"
-    if (pathOrBase64.startsWith("data:image")) {
-      return "image.jpg"; // default nama
-    }
-    // Kalau URL / path, ambil bagian terakhir
-    return pathOrBase64.split("/").pop() || "image.jpg";
-  }
-
-  const fetchTasks = async () => {
+  const fetchUsers = async () => {
     try {
       const token = localStorage.getItem("token");
-
-      const res = await fetch("http://localhost:3000/api/task/getAll", {
+      const res = await fetch("http://localhost:3000/api/user/getAll", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!res.ok) {
-        throw new Error("Unauthorized / Failed Fetch");
-      }
+      if (!res.ok) throw new Error("Failed fetch");
 
       const json: ApiResponse = await res.json();
-      setTasks(json.data || []);
+      setUsers(json.data || []);
     } catch (error) {
-      console.error("Failed fetch task:", error);
-      alert("Gagal mengambil data task (Unauthorized)");
+      console.error(error);
+      alert("Gagal mengambil data user");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTasks();
+    fetchUsers();
   }, [reloadKey]);
 
   /* =======================
-     DELETE TASK
+     DELETE USER
   ======================= */
   const handleConfirmDelete = async () => {
-    if (deleteTaskId === null) return;
+    if (!deleteUserId) return;
+
     try {
       setDeleting(true);
       const token = localStorage.getItem("token");
+
       const res = await fetch(
-        `http://localhost:3000/api/task/delete/${deleteTaskId}`,
+        `http://localhost:3000/api/user/delete/${deleteUserId}`,
         {
           method: "DELETE",
           headers: {
@@ -120,42 +108,40 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
           },
         },
       );
-      if (!res.ok) throw new Error("Failed to delete task");
 
-      setSuccessMessage("Task deleted successfully");
+      if (!res.ok) throw new Error("Delete failed");
 
-      setTimeout(() => {
-        setSuccessMessage("");
-      }, 3000);
-      fetchTasks();
+      setSuccessMessage("User deleted successfully");
+      fetchUsers();
+
+      setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error(error);
-      alert("Gagal hapus task");
+      alert("Gagal hapus user");
     } finally {
       setDeleting(false);
-      setDeleteTaskId(null);
+      setDeleteUserId(null);
     }
   };
 
   /* =======================
-     EDIT TASK
+     EDIT USER
   ======================= */
-  const handleEdit = (task: Task) => {
-    setEditingTask(task);
-    setImageFile(null);
+  const handleEdit = (trx: User) => {
+    setEditingUser(trx);
     setIsEditOpen(true);
   };
 
-  const handleUpdateTask = async (e: React.FormEvent) => {
+  const handleUpdateUser = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!editingTask) return;
+    if (!editingUser) return;
 
     try {
       setSaving(true);
       const token = localStorage.getItem("token");
 
       const res = await fetch(
-        `http://localhost:3000/api/task/update/${editingTask.id}`,
+        `http://localhost:3000/api/user/update/${editingUser.id}`,
         {
           method: "PATCH",
           headers: {
@@ -163,92 +149,59 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            nameTask: editingTask.nameTask,
-            statusTask: editingTask.statusTask.toUpperCase(),
-            startTask: new Date(editingTask.startTask).toISOString(),
-            finishTask: new Date(editingTask.finishTask).toISOString(),
-            image: editingTask.image || "", // base64 atau path baru
+            name: editingUser.name,
+            email: editingUser.email,
+            role: editingUser.role,
+            status: editingUser.status,
           }),
         },
       );
 
-      const json = await res.json();
+      if (!res.ok) throw new Error("Update failed");
 
-      if (!res.ok) {
-        console.error(json);
-        alert(json.message || "Gagal update task");
-        return;
-      }
-
-      // === UPDATE STATE TASKS LANGSUNG ===
-      setTasks((prev) =>
-        prev.map((task) =>
-          task.id === editingTask.id
-            ? { ...task, ...editingTask } // update semua field termasuk image
-            : task,
-        ),
-      );
-
-      setSuccessMessage("Task successfully updated");
+      setSuccessMessage("User updated successfully");
       setIsEditOpen(false);
-      setEditingTask(null);
-      setCurrentPage(1);
+      setEditingUser(null);
+      fetchUsers();
 
       setTimeout(() => setSuccessMessage(""), 3000);
     } catch (error) {
       console.error(error);
-      alert("Server error");
+      alert("Gagal update user");
     } finally {
       setSaving(false);
     }
   };
 
   /* =======================
-     STATUS COLOR
+     TYPE COLOR
   ======================= */
-  const renderStatusColor = (status: StatusTask) => {
-    if (status === "DONE") return "success";
-    if (status === "PROGRESS") return "warning";
-    return "error";
-  };
+  const renderRoleColor = (type: UserRole) =>
+    type === "USER" ? "light" : "primary";
+
+  const renderStatusColor = (type: UserStatus) =>
+    type === "ACTIVE" ? "success" : "error";
 
   if (loading) {
     return (
       <div className="p-5 text-gray-500 dark:text-gray-400">
-        Loading tasks...
+        Loading users...
       </div>
     );
   }
 
+  /* =======================
+     PAGINATION LOGIC
+  ======================= */
   const getPaginationPages = () => {
-    const pages: (number | string)[] = [];
-
-    if (totalPages <= 3) {
+    if (totalPages <= 3)
       return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
 
-    // awal
-    if (currentPage <= 2) {
-      pages.push(1, 2, 3, "...", totalPages);
-      return pages;
-    }
+    if (currentPage <= 2) return [1, 2, 3, "...", totalPages];
+    if (currentPage >= totalPages - 1)
+      return ["...", totalPages - 2, totalPages - 1, totalPages];
 
-    // akhir
-    if (currentPage >= totalPages - 1) {
-      pages.push("...", totalPages - 2, totalPages - 1, totalPages);
-      return pages;
-    }
-
-    // tengah
-    pages.push(
-      currentPage - 1,
-      currentPage,
-      currentPage + 1,
-      "...",
-      totalPages,
-    );
-
-    return pages;
+    return [currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
   };
 
   return (
@@ -293,11 +246,11 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
             <TableRow>
               {[
                 "No",
-                "Task Name",
-                "Start",
-                "Finish",
+                "Name",
+                "Email",
+                "Role",
                 "Status",
-                "Image",
+                "Date Active",
                 "Action",
               ].map((title) => (
                 <TableCell
@@ -313,50 +266,47 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
 
           {/* ================= BODY ================= */}
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
-            {paginatedTasks.map((task, index) => (
-              <TableRow key={task.id}>
+            {paginatedUsers.map((trx, index) => (
+              <TableRow key={trx.id}>
                 <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
                   {(currentPage - 1) * ITEMS_PER_PAGE + index + 1}
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
-                  {task.nameTask}
+                  {trx.name}
                 </TableCell>
 
-                <TableCell className="px-4 py-3 text-start text-gray-500 dark:text-gray-200">
-                  {new Date(task.startTask).toLocaleDateString()}
-                </TableCell>
-
-                <TableCell className="px-4 py-3 text-start text-gray-500 dark:text-gray-200">
-                  {new Date(task.finishTask).toLocaleDateString()}
+                <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
+                  {trx.email}
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start">
-                  <Badge size="sm" color={renderStatusColor(task.statusTask)}>
-                    {task.statusTask}
+                  <Badge size="sm" color={renderRoleColor(trx.role)}>
+                    {trx.role}
                   </Badge>
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start">
-                  <button
-                    onClick={() => setPreviewImage(task.image ?? null)}
-                    className="px-3 py-1  text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition"
-                  >
-                    <i className="bi bi-eye"></i>
-                  </button>
+                  <Badge size="sm" color={renderStatusColor(trx.status)}>
+                    {trx.status}
+                  </Badge>
+                </TableCell>
+
+                <TableCell className="px-4 py-3 text-start dark:text-gray-200">
+                  {new Date(trx.createdAt).toLocaleDateString()}
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start">
                   <div className="flex gap-2">
                     <button
-                      onClick={() => handleEdit(task)}
+                      onClick={() => handleEdit(trx)}
                       className="px-3 py-1 text-sm rounded bg-blue-500 text-white hover:bg-blue-600"
                     >
                       <i className="bi bi-pencil-square"></i>
                     </button>
 
                     <button
-                      onClick={() => setDeleteTaskId(task.id)}
+                      onClick={() => setDeleteUserId(trx.id)}
                       className="px-3 py-1 text-sm rounded bg-red-500 text-white hover:bg-red-600"
                     >
                       <i className="bi bi-trash3"></i>
@@ -366,10 +316,10 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
               </TableRow>
             ))}
 
-            {tasks.length === 0 && (
+            {users.length === 0 && (
               <TableRow>
                 <TableCell className="text-center py-6 text-gray-400 dark:text-gray-500">
-                  No tasks found
+                  No user found
                 </TableCell>
               </TableRow>
             )}
@@ -422,12 +372,12 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
         </div>
       )}
 
-      {/* ================= DELETE TASK MODAL ================= */}
-      {deleteTaskId !== null &&
+      {/* ================= DELETE USER MODAL ================= */}
+      {deleteUserId !== null &&
         createPortal(
           <div
             className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50"
-            onClick={() => setDeleteTaskId(null)}
+            onClick={() => setDeleteUserId(null)}
           >
             <div
               className="w-full max-w-sm rounded-2xl bg-white p-6 dark:bg-gray-800 shadow-lg"
@@ -437,12 +387,12 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
                 Delete Confirmation
               </h3>
               <p className="mb-6 text-gray-600 dark:text-gray-300">
-                Are you sure you want to delete this task?
+                Are you sure you want to delete this user?
               </p>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
-                  onClick={() => setDeleteTaskId(null)}
+                  onClick={() => setDeleteUserId(null)}
                   className="rounded-lg border px-4 py-2 text-sm dark:text-white"
                 >
                   Cancel
@@ -461,38 +411,9 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
           document.body,
         )}
 
-      {/* ================= IMAGE PREVIEW MODAL ================= */}
-      {previewImage &&
-        createPortal(
-          <div className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50 p-4">
-            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-xl relative w-full max-w-full sm:max-w-lg md:max-w-xl lg:max-w-2xl">
-              <button
-                onClick={() => setPreviewImage(null)}
-                className="absolute top-2 right-2 text-gray-500 hover:text-red-500 text-xl"
-              >
-                ✕
-              </button>
-
-              <img
-                src={previewImage}
-                alt="Preview"
-                className="
-                p-5
-            w-full 
-            h-auto 
-            max-h-[50vh] sm:max-h-[60vh] md:max-h-[70vh] 
-            rounded-lg 
-            object-contain
-          "
-              />
-            </div>
-          </div>,
-          document.body,
-        )}
-
-      {/* ================= EDIT TASK MODAL ================= */}
+      {/* ================= EDIT USER MODAL ================= */}
       {isEditOpen &&
-        editingTask &&
+        editingUser &&
         createPortal(
           <div
             className="fixed inset-0 z-[999999] flex items-center justify-center bg-black/50 backdrop-blur-sm"
@@ -503,138 +424,96 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
               onMouseDown={(e) => e.stopPropagation()}
             >
               <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
-                Edit Task
+                Edit User
               </h3>
 
-              <form className="space-y-4" onSubmit={handleUpdateTask}>
-                {/* Task Name */}
+              <form className="space-y-4" onSubmit={handleUpdateUser}>
+                {/* User Name */}
                 <div>
                   <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
-                    Task Name
+                    User Name
                   </label>
                   <input
-                    value={editingTask.nameTask}
+                    value={editingUser.name}
                     onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        nameTask: e.target.value,
+                      setEditingUser({
+                        ...editingUser,
+                        name: e.target.value,
                       })
                     }
                     className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
 
-                {/* Start Date */}
+                {/* Price */}
                 <div>
                   <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
-                    Start Date
+                    Email
                   </label>
                   <input
-                    type="date"
-                    value={editingTask.startTask.slice(0, 10)}
+                    value={editingUser.email}
                     onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        startTask: e.target.value,
+                      setEditingUser({
+                        ...editingUser,
+                        email: e.target.value,
                       })
                     }
                     className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
 
-                {/* Finish Date */}
+                {/* Role */}
                 <div>
                   <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
-                    Finish Date
+                    Role
                   </label>
-                  <input
-                    type="date"
-                    value={editingTask.finishTask.slice(0, 10)}
+                  <select
+                    value={editingUser.role}
                     onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        finishTask: e.target.value,
+                      setEditingUser({
+                        ...editingUser,
+                        role: e.target.value as UserRole,
                       })
                     }
                     className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
-                  />
+                  >
+                    <option value="USER">USER</option>
+                    <option value="ADMIN">ADMIN</option>
+                  </select>
                 </div>
 
-                {/* Status */}
+                {/* Role */}
                 <div>
                   <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
                     Status
                   </label>
                   <select
-                    value={editingTask.statusTask}
+                    value={editingUser.status}
                     onChange={(e) =>
-                      setEditingTask({
-                        ...editingTask,
-                        statusTask: e.target.value as StatusTask,
+                      setEditingUser({
+                        ...editingUser,
+                        status: e.target.value as UserStatus,
                       })
                     }
                     className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                   >
-                    <option value="PENDING">PENDING</option>
-                    <option value="PROGRESS">PROGRESS</option>
-                    <option value="DONE">DONE</option>
+                    <option value="NONACTIVE">NONACTIVE</option>
+                    <option value="ACTIVE">ACTIVE</option>
                   </select>
                 </div>
 
-                {/* Image */}
+                {/*Date  Created*/}
                 <div>
                   <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">
-                    Image
+                    Date Active
                   </label>
-
-                  {/* Kotak custom */}
-                  <div className="mb-2 flex items-center gap-2 rounded-lg border px-3 py-2 text-sm text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300">
-                    <span className="flex-1 truncate">
-                      {imageFile?.name ||
-                        (editingTask.image
-                          ? getFileName(editingTask.image)
-                          : "No file chosen")}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        document.getElementById("fileInput")?.click()
-                      }
-                      className="rounded bg-blue-600 px-3 py-1 text-white hover:bg-blue-700"
-                    >
-                      Upload
-                    </button>
-                  </div>
-
-                  {/* Sembunyikan input asli */}
                   <input
-                    id="fileInput"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-
-                      setImageFile(file);
-
-                      // Buat preview
-
-                      // Update langsung state editingTask.image dengan base64
-                      const reader = new FileReader();
-                      reader.onloadend = () => {
-                        if (editingTask) {
-                          setEditingTask({
-                            ...editingTask,
-                            image: reader.result as string, // ini base64
-                          });
-                        }
-                      };
-                      reader.readAsDataURL(file);
-                    }}
-                    className="hidden"
+                    type="date"
+                    value={editingUser.createdAt.slice(0, 10)}
+                    disabled
+                    className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
                   />
                 </div>
-
                 {/* Buttons */}
                 <div className="flex justify-end gap-2 pt-4">
                   <button
