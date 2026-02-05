@@ -15,7 +15,11 @@ export default function AddTask({ onSuccess }: { onSuccess?: () => void }) {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageBase64, setImageBase64] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [apiError, setApiError] = useState("");
 
+  const [errors, setErrors] = useState<{
+    nameTask?: string;
+  }>({});
   function getFileName(pathOrBase64: string) {
     if (!pathOrBase64) return "No file chosen";
 
@@ -28,11 +32,21 @@ export default function AddTask({ onSuccess }: { onSuccess?: () => void }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setErrors({});
+    setApiError("");
+    setSuccessMessage("");
+
+    const newErrors: typeof errors = {};
+
     if (!nameTask.trim()) {
-      alert("Task name is required");
-      return;
+      newErrors.nameTask = "Task name is required";
     }
 
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
     try {
       setSaving(true);
       const token = localStorage.getItem("token");
@@ -68,8 +82,8 @@ export default function AddTask({ onSuccess }: { onSuccess?: () => void }) {
 
       onSuccess?.(); // 🔥 refresh table tanpa reload
     } catch (err) {
-      console.error(err);
-      alert("Failed to add task");
+      setApiError("Failed to add task");
+      setTimeout(() => setApiError(""), 3000);
     } finally {
       setSaving(false);
     }
@@ -111,6 +125,40 @@ export default function AddTask({ onSuccess }: { onSuccess?: () => void }) {
         </div>
       )}
 
+      {/* alert error */}
+      {apiError && (
+        <div className="fixed top-6 left-1/2 z-[999999] -translate-x-1/2">
+          <div
+            className="
+        flex items-center gap-3
+        rounded-xl border border-red-200
+        bg-red-50 px-6 py-4
+        text-red-700 shadow-lg
+        animate-fade-in
+        dark:border-red-800
+        dark:bg-red-900/40
+        dark:text-red-300
+      "
+          >
+            <svg
+              className="h-6 w-6 flex-shrink-0"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+
+            <span className="text-sm font-semibold">{apiError}</span>
+          </div>
+        </div>
+      )}
+
       {/* BUTTON */}
       <button
         onClick={() => setOpen(true)}
@@ -142,9 +190,19 @@ export default function AddTask({ onSuccess }: { onSuccess?: () => void }) {
                   </label>
                   <input
                     value={nameTask}
-                    onChange={(e) => setNameTask(e.target.value)}
-                    className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    onChange={(e) => {
+                      setNameTask(e.target.value);
+                      setErrors((prev) => ({ ...prev, nameTask: undefined }));
+                    }}
+                    className={`w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white
+    ${errors.nameTask ? "border-red-500" : ""}`}
                   />
+
+                  {errors.nameTask && (
+                    <p className="mt-1 text-xs text-red-500">
+                      {errors.nameTask}
+                    </p>
+                  )}
                 </div>
 
                 {/* Start Date */}
