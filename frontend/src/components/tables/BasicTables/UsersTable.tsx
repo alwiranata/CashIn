@@ -387,7 +387,7 @@ export default function UserTable({ reloadKey }: UserTableProps) {
                 Delete Confirmation
               </h3>
               <p className="mb-6 text-gray-600 dark:text-gray-300">
-                Are you sure you want to delete this user?
+                This user will be deleted. Continue?
               </p>
               <div className="flex justify-end gap-2">
                 <button

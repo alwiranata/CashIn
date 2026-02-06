@@ -65,6 +65,20 @@ export default function TransactionTable({ reloadKey }: TransactionTableProps) {
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE,
   );
+  /* =======================
+     RUPIAH FORMAT
+  ======================= */
+  function formatRupiah(value: number | string) {
+    const numberValue = typeof value === "string" ? Number(value) : value;
+
+    if (isNaN(numberValue)) return "Rp 0";
+
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0, // rupiah tanpa koma
+    }).format(numberValue);
+  }
 
   /* =======================
      UTIL
@@ -283,7 +297,7 @@ export default function TransactionTable({ reloadKey }: TransactionTableProps) {
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
-                  {trx.price}
+                  {formatRupiah(trx.price)}
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
@@ -395,8 +409,8 @@ export default function TransactionTable({ reloadKey }: TransactionTableProps) {
               <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white">
                 Delete Confirmation
               </h3>
-              <p className="mb-6 text-gray-600 dark:text-gray-300">
-                Are you sure you want to delete this transaction?
+              <p className="mb-6  text-gray-600 dark:text-gray-300">
+                This transaction will be deleted. Continue?
               </p>
               <div className="flex justify-end gap-2">
                 <button
@@ -493,7 +507,7 @@ export default function TransactionTable({ reloadKey }: TransactionTableProps) {
                     onChange={(e) =>
                       setEditingTransaction({
                         ...editingTransaction,
-                        price: e.target.value,
+                        price: Number(e.target.value),
                       })
                     }
                     className="w-full rounded-lg border px-3 py-2 focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"

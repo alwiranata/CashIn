@@ -437,7 +437,7 @@ export default function TasksTable({ reloadKey }: TasksTableProps) {
                 Delete Confirmation
               </h3>
               <p className="mb-6 text-gray-600 dark:text-gray-300">
-                Are you sure you want to delete this task?
+                This task will be deleted. Continue?
               </p>
               <div className="flex justify-end gap-2">
                 <button
