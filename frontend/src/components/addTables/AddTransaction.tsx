@@ -47,7 +47,7 @@ export default function AddTransaction({
     }
 
     const numericPrice = Number(price);
-    
+
     if (!price.trim()) {
       newErrors.price = "Price is required";
     } else if (Number(price) <= 0) {
@@ -210,7 +210,13 @@ export default function AddTransaction({
                   </label>
                   <input
                     value={nameTransaction}
-                    onChange={(e) => setNameTransaction(e.target.value)}
+                    onChange={(e) => {
+                      setNameTransaction(e.target.value);
+                      setErrors((prev) => ({
+                        ...prev,
+                        nameTransaction: undefined,
+                      }));
+                    }}
                     className={`w-full rounded-lg border px-3 py-2 dark:bg-gray-800 dark:text-white
     ${errors.nameTransaction ? "border-red-500" : ""}`}
                   />
@@ -230,7 +236,13 @@ export default function AddTransaction({
                   <input
                     type="number"
                     value={price}
-                    onChange={(e) => setPrice(e.target.value)}
+                    onChange={(e) => {
+                      setPrice(e.target.value);
+                      setErrors((prev) => ({
+                        ...prev,
+                        price: undefined,
+                      }));
+                    }}
                     className={`w-full rounded-lg border px-3 py-2 dark:bg-gray-800 dark:text-white
     ${errors.price ? "border-red-500" : ""}`}
                   />
