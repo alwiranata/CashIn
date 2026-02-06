@@ -28,13 +28,15 @@ const navItems: NavItem[] = [
   },
   {
     name: "Tasks",
-    icon: <TaskIcon/>,
+    icon: <TaskIcon />,
     subItems: [{ name: "Task", path: "/task-tables", pro: false }],
   },
   {
     name: "Transactions",
     icon: <DollarLineIcon />,
-    subItems: [{ name: "Transaction", path: "/transaction-tables", pro: false }],
+    subItems: [
+      { name: "Transaction", path: "/transaction-tables", pro: false },
+    ],
   },
   {
     name: "Users",
@@ -55,6 +57,18 @@ const othersItems: NavItem[] = [
 ];
 
 const AppSidebar: React.FC = () => {
+  const [role, setRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const user = localStorage.getItem("user");
+    setRole(user ? JSON.parse(user).role.toLowerCase() : null);
+  }, []);
+  const filteredNavItems = navItems.filter((item) => {
+    if (item.name === "Users" && role !== "admin") {
+      return false;
+    }
+    return true;
+  });
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
 
@@ -76,7 +90,7 @@ const AppSidebar: React.FC = () => {
   useEffect(() => {
     let submenuMatched = false;
     ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : othersItems;
+      const items = menuType === "main" ? filteredNavItems : othersItems;
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
@@ -310,7 +324,7 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots className="size-6" />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {renderMenuItems(filteredNavItems, "main")}
             </div>
             <div className="">
               <h2

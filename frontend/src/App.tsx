@@ -39,7 +39,13 @@ export default function App() {
             {/* Tables */}
             <Route path="task-tables" element={<Tasks />} />
             <Route path="transaction-tables" element={<Transactions />} />
-            <Route path="user-tables" element={<Users />} />
+
+            {/* Hanya admin yang bisa akses dan lihat user-tables */}
+            <Route
+              element={<ProtectedRoute allowedRoles={["admin"]} />}
+            >
+              <Route path="user-tables" element={<Users />} />
+            </Route>
           </Route>
         </Route>
 

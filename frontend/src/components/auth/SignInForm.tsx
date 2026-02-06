@@ -52,6 +52,15 @@ export default function SignInForm() {
       // simpan token
       localStorage.setItem("token", data.data.token);
 
+      // ✅ simpan user + role agar ProtectedRoute bisa baca
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          name: data.data.user,
+          role: data.data.role, // contoh: "ADMIN"
+        }),
+      );
+      
       navigate("/");
     } catch (err: any) {
       if (err?.errors && Array.isArray(err.errors)) {
