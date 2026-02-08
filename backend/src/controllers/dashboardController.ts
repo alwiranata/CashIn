@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { prisma } from "../lib/prisma";
 import { userRequest } from "../types/userRequest";
+
 export const getDashboard: RequestHandler = async (req, res) => {
   try {
     const userReq = req as userRequest;
@@ -56,6 +57,42 @@ export const getDashboard: RequestHandler = async (req, res) => {
       }
     });
 
+    // =========================
+    // 🔽 TAMBAHAN (TANPA UBAH YANG LAMA)
+    // =========================
+
+    // 🎯 target bulanan (sementara hardcode)
+    const monthlyTarget = 5000;
+
+    // 📆 bulan sekarang
+    const currentMonthIndex = new Date().getMonth();
+    const currentMonthIncome = monthlyIncome[currentMonthIndex];
+
+    // 📅 income hari ini
+    const startOfToday = new Date();
+    startOfToday.setHours(0, 0, 0, 0);
+
+    const endOfToday = new Date();
+    endOfToday.setHours(23, 59, 59, 999);
+
+    const todayIncome = transactions.reduce((sum, t) => {
+      const date = new Date(t.transactionDate);
+      if (
+        t.typeTransaction === "INCOME" &&
+        date >= startOfToday &&
+        date <= endOfToday
+      ) {
+        return sum + t.price;
+      }
+      return sum;
+    }, 0);
+
+    // 📊 progress radial (%)
+    const progressPercent =
+      monthlyTarget > 0
+        ? Math.min(Math.round((currentMonthIncome / monthlyTarget) * 100), 100)
+        : 0;
+
     return res.status(200).json({
       message: "Dashboard summary fetched successfully",
       data: {
@@ -66,6 +103,12 @@ export const getDashboard: RequestHandler = async (req, res) => {
         totalExpense,
         monthlyIncome,
         monthlyExpense,
+
+        // 🔥 DATA BARU (UNTUK UI)
+        monthlyTarget,
+        currentMonthIncome,
+        todayIncome,
+        progressPercent,
       },
     });
   } catch (error) {
