@@ -66,17 +66,17 @@ export default function TransactionTable({ reloadKey }: TransactionTableProps) {
     currentPage * ITEMS_PER_PAGE,
   );
   /* =======================
-     RUPIAH FORMAT
+     USD FORMAT
   ======================= */
-  function formatRupiah(value: number | string) {
+  function formatUSD(value: number | string) {
     const numberValue = typeof value === "string" ? Number(value) : value;
 
-    if (isNaN(numberValue)) return "Rp 0";
+    if (isNaN(numberValue)) return "$0";
 
-    return new Intl.NumberFormat("id-ID", {
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0, // rupiah tanpa koma
+      currency: "USD",
+      minimumFractionDigits: 0, // tanpa desimal
     }).format(numberValue);
   }
 
@@ -297,7 +297,7 @@ export default function TransactionTable({ reloadKey }: TransactionTableProps) {
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">
-                  {formatRupiah(trx.price)}
+                  {formatUSD(trx.price)}
                 </TableCell>
 
                 <TableCell className="px-4 py-3 text-start text-gray-800 dark:text-gray-200">

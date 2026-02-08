@@ -1,12 +1,7 @@
 import { useState } from "react";
 import { useEffect } from "react";
 import axios from "axios";
-import {
-  GroupIcon,
-  BoxIconLine,
-  DollarLineIcon,
- 
-} from "../../icons";
+import { GroupIcon, BoxIconLine, DollarLineIcon } from "../../icons";
 
 interface DashboardData {
   totalUsers: number;
@@ -42,7 +37,13 @@ export default function EcommerceMetrics() {
     fetchDashboard();
   }, []);
 
-  const formatRupiah = (value: number) => `Rp ${value.toLocaleString("id-ID")}`;
+  const formatUSD = (value: number) =>
+    new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      maximumFractionDigits: 0,
+    }).format(value);
+
 
   if (loading) {
     return <div>Loading metrics...</div>;
@@ -94,11 +95,9 @@ export default function EcommerceMetrics() {
         </div>
         <div className="flex items-end justify-between mt-5">
           <div>
-            <span className="text-sm text-green-400">
-              INCOME
-            </span>
+            <span className="text-sm text-green-400">INCOME</span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              {formatRupiah(data.totalIncome)}
+              {formatUSD(data.totalIncome)}
             </h4>
           </div>
         </div>
@@ -111,11 +110,9 @@ export default function EcommerceMetrics() {
         </div>
         <div className="flex items-end justify-between mt-5">
           <div>
-            <span className="text-sm text-red-400">
-              EXPENSE
-            </span>
+            <span className="text-sm text-red-400">EXPENSE</span>
             <h4 className="mt-2 font-bold text-gray-800 text-title-sm dark:text-white/90">
-              {formatRupiah(data.totalExpense)}
+              {formatUSD(data.totalExpense)}
             </h4>
           </div>
         </div>
