@@ -1,12 +1,43 @@
 import Chart from "react-apexcharts";
 import { ApexOptions } from "apexcharts";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dropdown } from "../ui/dropdown/Dropdown";
 import { DropdownItem } from "../ui/dropdown/DropdownItem";
 import { MoreDotIcon } from "../../icons";
+import axios from "axios";
+
+interface DashboardData {
+  monthlyTarget: number;
+  currentMonthIncome: number;
+  todayIncome: number;
+  progressPercent: number;
+}
 
 export default function MonthlyTarget() {
-  const series = [75.55];
+  const [data, setData] = useState<DashboardData | null>(null);
+
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:3000/api/dashboard/summary",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+
+        setData(res.data.data);
+      } catch (error) {
+        console.error("Failed to fetch dashboard", error);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
+
+  const series = [data?.progressPercent ?? 0];
   const options: ApexOptions = {
     colors: ["#465FFF"],
     chart: {
@@ -62,7 +93,16 @@ export default function MonthlyTarget() {
 
   function closeDropdown() {
     setIsOpen(false);
-  } 
+  }
+
+  function formatUSD(value: number) {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 0,
+    }).format(value);
+  }
+
   return (
     <div className="h-full flex flex-col rounded-2xl border border-gray-200 bg-gray-100 dark:border-gray-800 dark:bg-white/[0.03]">
       <div className="h-full px-5 pt-5 bg-white shadow-default rounded-2xl pb-11 dark:bg-gray-900 sm:px-6 sm:pt-6">
@@ -74,29 +114,6 @@ export default function MonthlyTarget() {
             <p className="mt-1 text-gray-500 text-theme-sm dark:text-gray-400">
               Target you’ve set for each month
             </p>
-          </div>
-          <div className="relative inline-block">
-            <button className="dropdown-toggle" onClick={toggleDropdown}>
-              <MoreDotIcon className="text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 size-6" />
-            </button>
-            <Dropdown
-              isOpen={isOpen}
-              onClose={closeDropdown}
-              className="w-40 p-2"
-            >
-              <DropdownItem
-                onItemClick={closeDropdown}
-                className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                View More
-              </DropdownItem>
-              <DropdownItem
-                onItemClick={closeDropdown}
-                className="flex w-full font-normal text-left text-gray-500 rounded-lg hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                Delete
-              </DropdownItem>
-            </Dropdown>
           </div>
         </div>
         <div className="relative ">
@@ -110,12 +127,11 @@ export default function MonthlyTarget() {
           </div>
 
           <span className="absolute left-1/2 top-full -translate-x-1/2 -translate-y-[95%] rounded-full bg-success-50 px-3 py-1 text-xs font-medium text-success-600 dark:bg-success-500/15 dark:text-success-500">
-            +10%
+            {formatUSD(data?.monthlyTarget ?? 0)}
           </span>
         </div>
         <p className="mx-auto mt-15 w-full max-w-[380px] text-center text-sm text-gray-500 sm:text-base">
-          You earn $3287 today, it's higher than last month. Keep up your good
-          work!
+          You earn {formatUSD(data?.todayIncome ?? 0)} today, keep it up!
         </p>
       </div>
 
@@ -125,7 +141,7 @@ export default function MonthlyTarget() {
             Target
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-            $20K
+            {formatUSD(data?.monthlyTarget ?? 0)}
             <svg
               width="16"
               height="16"
@@ -150,7 +166,7 @@ export default function MonthlyTarget() {
             Revenue
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-            $20K
+            {formatUSD(data?.currentMonthIncome ?? 0)}
             <svg
               width="16"
               height="16"
@@ -175,7 +191,7 @@ export default function MonthlyTarget() {
             Today
           </p>
           <p className="flex items-center justify-center gap-1 text-base font-semibold text-gray-800 dark:text-white/90 sm:text-lg">
-            $20K
+            {formatUSD(data?.todayIncome ?? 0)}
             <svg
               width="16"
               height="16"
